@@ -89,7 +89,7 @@ These are the choices an agent must **not** silently undo.
 
 11. **Loyalty = ledger + rollup.** `Loyalty_Point_Transaction__c` (earn/redeem/adjustment) with a roll-up balance on `Account`, not a single mutable balance field — gives an auditable history and a self-maintaining balance.
 
-12. **Delivery = `Delivery__c` custom object; Delivery Agent = `User` lookup** (assumes drivers are licensed users). **Open:** if drivers won't be licensed, swap to a lightweight `Delivery_Agent__c` object with an availability flag — see section 7.
+12. **Delivery = `Delivery__c` custom object; Delivery Agent = `User` lookup** (assumes drivers are licensed users). **Open:** if drivers won't be licensed, swap to a lightweight `Delivery_Agent__c` object with an availability flag — see section 7. **→ RESOLVED: built as `Delivery_Agent__c` custom object** (drivers are not licensed users); `Delivery__c.Delivery_Agent__c` is a `Lookup(Delivery_Agent__c)`.
 
 13. **A `Quote` step sits between Opportunity and Order** for bulk, as the natural home for negotiated pricing.
 
@@ -120,7 +120,10 @@ Full field-level detail and the Mermaid ER diagram are in `Bakeroo_Data_Model_v1
 - Three process flows finalized with diagrams → `Bakeroo_Process_Flows_v1.md`.
 - Data model finalized (objects, fields, relationships, ER diagram) on the **split-object** design → `Bakeroo_Data_Model_v1.md`, with the rejected single-object variant preserved as Appendix A.
 
-**Not yet started:** any actual org configuration/metadata, and the **automation layer** (next).
+**Done (build — see `Bakeroo_Build_Plan.md`):**
+- Object/data-model layer built and deployed to both `BakerooScratch` (staging) and `BakerooOrg` (dev): all 12 custom objects, relationships/junctions, standard-object custom fields, Account/Order record types, and all roll-ups/formulas.
+
+**Not yet started:** pricebook/menu data, tabs/app/layouts, profiles/permission sets/roles/sharing, and the **automation layer** (next).
 
 ---
 
@@ -132,10 +135,10 @@ Full field-level detail and the Mermaid ER diagram are in `Bakeroo_Data_Model_v1
 - **Scheduled Flow:** drop bulk order into kitchen N hours before delivery date, gated on goods-receipt confirmation.
 - **Approval processes:** bulk discount above threshold → OM/MD; high-value Purchase Order → OM.
 
-**Open decisions still pending sign-off:**
-- **Delivery agents:** licensed `User` records vs a `Delivery_Agent__c` custom object (affects the Delivery lookup).
-- **Person Accounts:** confirm before enabling (irreversible).
-- **Payment:** whether COD is allowed alongside pay-before-kitchen.
+**Open decisions — RESOLVED** (during the data-model build; see `Bakeroo_Build_Plan.md`):
+- **Delivery agents:** ✅ **`Delivery_Agent__c` custom object** with an availability flag (drivers are *not* licensed users). `Delivery__c.Delivery_Agent__c` → `Lookup(Delivery_Agent__c)`. Supersedes the `User`-lookup default in decision 12.
+- **Person Accounts:** ✅ **Enabled** (irreversible) on both the dev org (`BakerooOrg`) and the scratch org (`BakerooScratch`).
+- **Payment:** ✅ **Pay-before-kitchen only, no COD.** `Order.Payment_Status__c` = Pending / Paid / Refunded.
 
 ---
 

@@ -61,7 +61,7 @@ This is the object list, field-level detail, and relationship map for the three 
 | Feedback | `Feedback__c` | Post-delivery review/rating |
 | Loyalty Point Transaction | `Loyalty_Point_Transaction__c` | Earn/redeem ledger; balance rolls up to Account |
 
-> **Delivery Agent** is modelled as a **User** (internal, licensed) referenced by lookup on Delivery. If your drivers won't be licensed Salesforce users, swap this for a lightweight `Delivery_Agent__c` custom object — noted again in §5.
+> **Delivery Agent** is modelled as a **User** (internal, licensed) referenced by lookup on Delivery. If your drivers won't be licensed Salesforce users, swap this for a lightweight `Delivery_Agent__c` custom object — noted again in §5. **→ BUILT AS `Delivery_Agent__c` custom object** (drivers are not licensed users); `Delivery__c.Delivery_Agent__c` = `Lookup(Delivery_Agent__c)`.
 
 ---
 
@@ -152,10 +152,12 @@ Only meaningful fields are listed — standard system fields (Id, Name, CreatedD
 | Batch / Expiry | Text / Date | V2 (FIFO), one inventory record per batch |
 
 ### Inventory Reservation (`Inventory_Reservation__c`)
+> **AS BUILT:** implemented as a **two-master junction** — `Order__c` (**Master-Detail**, primary; cascade-release on cancel) + `Ingredient_Inventory__c` (**Master-Detail**, secondary). The secondary MD is what lets `Ingredient_Inventory__c.Quantity_Reserved__c` be a native roll-up (and `Quantity_Available__c` a declarative formula). The `Ingredient` lookup below was replaced by the MD to the inventory row.
+
 | Field | Type | Notes |
 |---|---|---|
-| Ingredient | Lookup(Ingredient) | |
-| Order | Master-Detail(Order) | Release when order cancelled |
+| Ingredient Inventory | Master-Detail(Ingredient_Inventory) | *As built* — secondary master; enables the reserved-qty roll-up |
+| Order | Master-Detail(Order) | Primary master; release when order cancelled |
 | Quantity | Number | |
 | Reservation Type | Picklist | Soft (same-day) / Forward (bulk) |
 | Needed-By Date | Date | = delivery date for forward holds |
@@ -197,7 +199,7 @@ Only meaningful fields are listed — standard system fields (Id, Name, CreatedD
 | Field | Type | Notes |
 |---|---|---|
 | Order | Master-Detail(Order) | |
-| Delivery Agent | Lookup(User) | Auto-assigned by availability |
+| Delivery Agent | Lookup(Delivery_Agent__c) | *As built* — custom object, not User; auto-assigned by availability |
 | Status | Picklist | Assigned / Out for delivery / Delivered / Failed |
 | Scheduled Date | Date/Time | |
 | Delivered At | Date/Time | |

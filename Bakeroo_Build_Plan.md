@@ -13,6 +13,26 @@
 
 ---
 
+## Build status (updated as of the data-model build)
+
+**Done and deployed to BOTH `BakerooScratch` (staging) and `BakerooOrg` (dev):**
+- ✅ **§3 Prerequisites** — Dev Hub enabled on `BakerooOrg` (`target-dev-hub` set); Person Accounts enabled (both orgs); scratch org `BakerooScratch` created with the `PersonAccounts` feature.
+- ✅ **§4 Standard-object custom fields + record types** — Account, Lead, Opportunity, Order, Product2. Record types `Account.Bulk_Buyer` / `Account.Supplier` and `Order.Same_Day_B2C` / `Order.Bulk_Scheduled_B2B` retrieved from dev (Customer = stock `PersonAccount` RT).
+- ✅ **§5 All 12 custom objects + relationships/junctions** — `Ingredient__c`, `Recipe__c`, `Recipe_Ingredient__c` retrieved from dev; the rest scaffolded (incl. `Delivery_Agent__c` and the two-master `Inventory_Reservation__c`).
+- ✅ **§7 All roll-ups & formulas** — R1 loyalty balance, R2 reserved qty, R3 PO total, F1 available qty, F2 line total.
+
+**Not yet started:** §8 pricebook + Product2 menu data · §9 tabs/app/layouts/Lightning pages · §10 permission sets/profiles/roles/OWD-sharing · automation phase.
+
+**Deviations from the original plan (applied during build):**
+- Order record types are named `Same_Day_B2C` / `Bulk_Scheduled_B2B` (not `Same_Day` / `Bulk_Scheduled`).
+- "Customer" account type uses the stock **`PersonAccount`** record type (no separate `Customer` RT created).
+- Address fields (`Account.Default_Delivery_Address__c`, `Order.Delivery_Address__c`, `Delivery__c.Delivery_Address__c`) are **`TextArea`** — Salesforce has no custom compound-Address field type (corrects gotcha #15).
+- **Gotcha #4 resolved via the junction approach** — `Inventory_Reservation__c` is a two-master junction, so `Quantity_Reserved__c` is a native roll-up and `Quantity_Available__c` is fully declarative.
+
+**Open items carried to §10:** OWD inconsistency (dev-built objects are `ReadWrite`; scaffolded ones `Private`/`ControlledByParent`); manual Lead→Opportunity field mapping.
+
+---
+
 ## 0. Resolved decisions (locked before planning)
 
 These four were open in the context doc and have been resolved with the owner:
@@ -28,7 +48,7 @@ These four were open in the context doc and have been resolved with the owner:
 
 ## 1. Environment & workflow
 
-**Observed project state**
+**Observed project state** *(initial snapshot — see "Build status" above for what has since changed: Dev Hub is now enabled and `BakerooScratch` exists)*
 - Source-format SFDX project. Single package dir `force-app/main/default`. `sourceApiVersion 67.0`, no namespace.
 - Deploy mechanism: `sf project deploy start` (metadata API, source format).
 - Default authed org `BakerooOrg` is a **Developer Edition** org (`orgfarm-…-dev-ed`) — **persistent, `tracksSource: false`**. Not a scratch org, not a sandbox.
@@ -76,9 +96,9 @@ Prerequisites (irreversible / org-level)
 
 ## 3. Prerequisites (do these FIRST)
 
-- [ ] **P1 — Enable Dev Hub** (Setup → Dev Hub) on a DE org; `sf org login web` to auth it. *Manual, one-time.*
-- [ ] **P2 — ⚠️ Person Accounts enabled** (irreversible). Already done on `BakerooOrg`. For scratch, add `"PersonAccounts"` to `config/project-scratch-def.json` `features`. *Manual on persistent orgs / feature flag on scratch. Signed off.*
-- [ ] **P3 — Create scratch org** from the updated def (`sf org create scratch -f config/project-scratch-def.json -a BakerooScratch`). *CLI.*
+- [x] **P1 — Enable Dev Hub** — enabled on `BakerooOrg`; `target-dev-hub=BakerooOrg` set. *Done.*
+- [x] **P2 — ⚠️ Person Accounts enabled** (irreversible) — done on `BakerooOrg`; `"PersonAccounts"` added to `config/project-scratch-def.json` and verified on `BakerooScratch`. *Done, signed off.*
+- [x] **P3 — Create scratch org** — `BakerooScratch` created (`sf org create scratch -f config/project-scratch-def.json -a BakerooScratch -v BakerooOrg`). *Done.*
 - [ ] **P4 — Confirm base org settings:** Lightning Experience enabled (already), multi-currency **not** needed for V1 (Currency fields use org default), State/Country picklists optional. *Manual review.*
 - [ ] **P5 — Standard Pricebook active** (needed before menu pricing). *Standard Pricebook is auto-present; activation/entries are DATA, not metadata — see §8.*
 
