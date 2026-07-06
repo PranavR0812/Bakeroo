@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Unit_of_Measure__c</fullName>
+    <label>Unit of Measure</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Cup (c)</fullName>
+                <default>false</default>
+                <label>Cup (c)</label>
+            </value>
+            <value>
+                <fullName>Fluid ounce (fl oz)</fullName>
+                <default>false</default>
+                <label>Fluid ounce (fl oz)</label>
+            </value>
+            <value>
+                <fullName>Gallon (gal)</fullName>
+                <default>false</default>
+                <label>Gallon (gal)</label>
+            </value>
+            <value>
+                <fullName>Gram (g)</fullName>
+                <default>false</default>
+                <label>Gram (g)</label>
+            </value>
+            <value>
+                <fullName>Kilogram (kg)</fullName>
+                <default>false</default>
+                <label>Kilogram (kg)</label>
+            </value>
+            <value>
+                <fullName>Liter (L)</fullName>
+                <default>false</default>
+                <label>Liter (L)</label>
+            </value>
+            <value>
+                <fullName>Milliliter (mL)</fullName>
+                <default>false</default>
+                <label>Milliliter (mL)</label>
+            </value>
+            <value>
+                <fullName>Ounce (oz)</fullName>
+                <default>false</default>
+                <label>Ounce (oz)</label>
+            </value>
+            <value>
+                <fullName>Pint (pt)</fullName>
+                <default>false</default>
+                <label>Pint (pt)</label>
+            </value>
+            <value>
+                <fullName>Pound (lb)</fullName>
+                <default>false</default>
+                <label>Pound (lb)</label>
+            </value>
+            <value>
+                <fullName>Quart (qt)</fullName>
+                <default>false</default>
+                <label>Quart (qt)</label>
+            </value>
+            <value>
+                <fullName>Tablespoon (tbsp)</fullName>
+                <default>false</default>
+                <label>Tablespoon (tbsp)</label>
+            </value>
+            <value>
+                <fullName>Teaspoon (tsp)</fullName>
+                <default>false</default>
+                <label>Teaspoon (tsp)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

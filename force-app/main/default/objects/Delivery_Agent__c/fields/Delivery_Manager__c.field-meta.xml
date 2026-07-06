@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Delivery_Manager__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Delivery Manager</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Delivery Agents</relationshipLabel>
+    <relationshipName>Delivery_Agents</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

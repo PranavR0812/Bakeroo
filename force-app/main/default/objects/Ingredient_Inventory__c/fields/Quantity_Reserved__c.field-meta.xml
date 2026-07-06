@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Quantity_Reserved__c</fullName>
+    <externalId>false</externalId>
+    <label>Quantity Reserved</label>
+    <summarizedField>Inventory_Reservation__c.Quantity__c</summarizedField>
+    <summaryForeignKey>Inventory_Reservation__c.Ingredient_Inventory__c</summaryForeignKey>
+    <summaryFilterItems>
+        <field>Inventory_Reservation__c.Status__c</field>
+        <operation>equals</operation>
+        <value>Active</value>
+    </summaryFilterItems>
+    <summaryOperation>sum</summaryOperation>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>
