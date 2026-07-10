@@ -96,6 +96,22 @@ sf data query -o <org> -q "SELECT …"
   `Default_Delivery_Address__c`); use standard `ShippingAddress` if structured components are needed.
 - **Lead → Opportunity field mapping is manual** (Setup → Map Lead Fields), not captured in metadata.
 - Each `Product2` needs a **Standard Pricebook Entry** before joining a custom pricebook.
+- **Person Account layouts are a separate type.** Person fields (`PersonEmail`, `PersonMobilePhone`,
+  etc.) can only live on the dedicated `PersonAccount-Person Account Layout` — a business `Account`
+  layout rejects them ("Cannot use field:PersonEmail in a layout"). The person-account record type
+  **cannot** be assigned via profile `layoutAssignments` (both orgs reject `recordType Account.PersonAccount`);
+  the PA layout is used automatically for all person accounts. Customize the PA layout by retrieving
+  `Layout:PersonAccount-Person Account Layout` and editing it.
+- **`CustomTab` needs a valid `motif`** (icon), e.g. `Custom53: Bread`; an invalid name fails deploy.
+  Junctions and line-item objects (`Recipe_Ingredient__c`, `Purchase_Order_Line__c`, …) get **no tab**.
+- **Assign layouts via a *minimal partial* profile** — deploy a `Profile` file containing only
+  `<custom>`, `<userLicense>`, and the `<layoutAssignments>` you want. Do **not** retrieve+redeploy
+  the full profile (Admin is ~893 lines) — the partial merges the assignments without touching other
+  settings. (Retrieving `Profile:Admin` alone returns **no** `layoutAssignments`; they only come back
+  when layouts are retrieved in the same call.)
+- **Stock cloud layouts reference sample fields the scratch org lacks** (e.g. `CustomerPriority__c`,
+  `SLA__c`). If you retrieve a stock layout as a template, **don't keep it in source** — it exists in
+  dev already and won't validate against scratch. Same reason the customized PA layout is dev-only.
 
 ## Testing & quality
 
@@ -156,7 +172,18 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   (SUM, `Status=Active`) + `Quantity_Available__c` (formula), `Purchase_Order__c.Total__c` (SUM) +
   `Purchase_Order_Line__c.Line_Total__c` (formula).
 
-**Not yet done:** §8 pricebook + Product2 menu data · §9 tabs/app/layouts/Lightning pages ·
+**Tabs, app & record-type layouts (§9, partial):**
+- 8 custom tabs (Ingredient, Recipe, Ingredient_Inventory, Purchase_Order, Delivery, Delivery_Agent,
+  Feedback, Loyalty_Point_Transaction); junctions + line items get no tab.
+- `Bakeroo` Lightning app already existed in dev — retrieved and enhanced with the custom tabs,
+  re-grouped, and pointed off the wrong standard `PurchaseOrder`/`PurchaseOrderItem` tabs onto the
+  custom `Purchase_Order__c` tab. Bakery-brown brand + `Bakeroo_UtilityBar` preserved.
+- Record-type layouts: `Order-Same_Day_B2C`, `Order-Bulk_Scheduled_B2B`, `Account-Bulk_Buyer`,
+  `Account-Supplier` (built + assigned via a minimal partial `Admin` profile, both orgs);
+  `PersonAccount-Person Account Layout` customized with a *Loyalty & Delivery* section (dev-only).
+- **Deferred:** per-custom-object layouts (auto-generated defaults in use) and Lightning record pages.
+
+**Not yet done:** §8 pricebook + Product2 menu data · §9 remainder (per-object layouts, FlexiPages) ·
 §10 permission sets/profiles/roles/OWD-sharing · the automation phase.
 
 **Known open items:**

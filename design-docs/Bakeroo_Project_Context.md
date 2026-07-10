@@ -122,8 +122,9 @@ Full field-level detail and the Mermaid ER diagram are in `Bakeroo_Data_Model_v1
 
 **Done (build — see `Bakeroo_Build_Plan.md`):**
 - Object/data-model layer built and deployed to both `BakerooScratch` (staging) and `BakerooOrg` (dev): all 12 custom objects, relationships/junctions, standard-object custom fields, Account/Order record types, and all roll-ups/formulas.
+- **UI shell (§9, partial):** 8 custom tabs; the `Bakeroo` Lightning app (enhanced from the manually-built dev app); Account (`Bulk_Buyer`, `Supplier`) and Order (`Same_Day_B2C`, `Bulk_Scheduled_B2B`) record-type page layouts + assignment; the Person Account layout customized with loyalty balance + default delivery address (dev-only).
 
-**Not yet started:** pricebook/menu data, tabs/app/layouts, profiles/permission sets/roles/sharing, and the **automation layer** (next).
+**Not yet started:** pricebook/menu data; per-custom-object layouts + Lightning record pages; profiles/permission sets/roles/sharing; and the **automation layer** (next).
 
 ---
 

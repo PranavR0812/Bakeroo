@@ -20,16 +20,20 @@
 - ✅ **§4 Standard-object custom fields + record types** — Account, Lead, Opportunity, Order, Product2. Record types `Account.Bulk_Buyer` / `Account.Supplier` and `Order.Same_Day_B2C` / `Order.Bulk_Scheduled_B2B` retrieved from dev (Customer = stock `PersonAccount` RT).
 - ✅ **§5 All 12 custom objects + relationships/junctions** — `Ingredient__c`, `Recipe__c`, `Recipe_Ingredient__c` retrieved from dev; the rest scaffolded (incl. `Delivery_Agent__c` and the two-master `Inventory_Reservation__c`).
 - ✅ **§7 All roll-ups & formulas** — R1 loyalty balance, R2 reserved qty, R3 PO total, F1 available qty, F2 line total.
+- ✅ **§9 (partial) Tabs, app & record-type layouts** — 8 custom tabs; the pre-existing `Bakeroo` Lightning app (built manually in dev) retrieved and enhanced with the custom tabs; **Account** (`Bulk_Buyer`, `Supplier`) + **Order** (`Same_Day_B2C`, `Bulk_Scheduled_B2B`) record-type layouts built and assigned via a minimal partial `Admin` profile; the **Person Account** layout customized in dev (loyalty balance + default delivery address).
 
-**Not yet started:** §8 pricebook + Product2 menu data · §9 tabs/app/layouts/Lightning pages · §10 permission sets/profiles/roles/OWD-sharing · automation phase.
+**Not yet started:** §8 pricebook + Product2 menu data · §9 remainder (per-custom-object layouts, Lightning record pages/FlexiPages) · §10 permission sets/profiles/roles/OWD-sharing · automation phase.
 
 **Deviations from the original plan (applied during build):**
 - Order record types are named `Same_Day_B2C` / `Bulk_Scheduled_B2B` (not `Same_Day` / `Bulk_Scheduled`).
 - "Customer" account type uses the stock **`PersonAccount`** record type (no separate `Customer` RT created).
 - Address fields (`Account.Default_Delivery_Address__c`, `Order.Delivery_Address__c`, `Delivery__c.Delivery_Address__c`) are **`TextArea`** — Salesforce has no custom compound-Address field type (corrects gotcha #15).
 - **Gotcha #4 resolved via the junction approach** — `Inventory_Reservation__c` is a two-master junction, so `Quantity_Reserved__c` is a native roll-up and `Quantity_Available__c` is fully declarative.
+- **§9 — the `Bakeroo` Lightning app already existed in dev** (built manually) and pointed at the *standard* `PurchaseOrder`/`PurchaseOrderItem` tabs; retrieved and corrected to use the custom **`Purchase_Order__c`** tab plus the other custom-object tabs.
+- **§9 — Person Account layout is a special case.** Person fields (`PersonEmail`, etc.) only work on the dedicated `PersonAccount-Person Account Layout`, not a business `Account` layout; and the person-account record type **cannot** be assigned via profile `layoutAssignments` (both orgs reject `Account.PersonAccount`). The PA layout is used automatically for all person accounts. Its loyalty/delivery customization is **dev-only** (it references dev's stock Sales Cloud sample fields the scratch org lacks).
+- **§9 — layout assignment done via a minimal partial `Admin` profile** (only `layoutAssignments`), not a full-profile deploy, to avoid touching the ~893 lines of other Admin settings.
 
-**Open items carried to §10:** OWD inconsistency (dev-built objects are `ReadWrite`; scaffolded ones `Private`/`ControlledByParent`); manual Lead→Opportunity field mapping.
+**Open items carried to §10:** OWD inconsistency (dev-built objects are `ReadWrite`; scaffolded ones `Private`/`ControlledByParent`); manual Lead→Opportunity field mapping; layout assignment currently only on the `Admin` profile (the function-based profiles/perm sets in §10 will need their own assignments).
 
 ---
 
@@ -320,14 +324,14 @@ implemented as a two-master junction (Order + Ingredient_Inventory) — see gotc
 
 ## 9. Tabs, app, page layouts & Lightning record pages
 
-- [ ] **Custom tabs** for each custom object that needs one (Ingredient, Recipe, Ingredient_Inventory, Purchase_Order, Delivery, Delivery_Agent, Feedback, Loyalty_Point_Transaction; junctions typically no tab). *Metadata.*
-- [ ] **`Bakeroo` Lightning app** grouping the tabs. *Metadata.*
-- [ ] **Page layouts per record type:**
-  - Account: **Customer** (Person Account layout — loyalty balance, default delivery address; hide supplier fields), **Bulk_Buyer**, **Supplier** (payment terms, lead time, active-supplier). *Metadata.*
-  - Order: **Same_Day** (kitchen status, same-day flag, payment) vs **Bulk_Scheduled** (source opportunity, scheduled date, deposit fields). *Metadata.*
-  - Custom objects: one layout each; surface roll-ups/formulas read-only. *Metadata.*
-- [ ] **Lightning record pages (FlexiPages)** per object/record type as needed; assign per app/record type. *Metadata.*
-- [ ] Assign record types → layouts per profile. *Profile metadata (partial) / manual.*
+- [x] **Custom tabs** for each custom object that needs one — built all 8 (Ingredient, Recipe, Ingredient_Inventory, Purchase_Order, Delivery, Delivery_Agent, Feedback, Loyalty_Point_Transaction); junctions + `Purchase_Order_Line__c` get no tab. *Deployed both orgs.*
+- [x] **`Bakeroo` Lightning app** — already existed in dev; retrieved and enhanced with the 8 custom tabs, re-grouped, and corrected off the wrong standard `PurchaseOrder`/`PurchaseOrderItem` tabs onto the custom `Purchase_Order__c` tab. Bakery-brown brand + `Bakeroo_UtilityBar` preserved. *Deployed both orgs.*
+- [x] **Page layouts per record type:**
+  - Account: **Customer** — done via the dedicated **`PersonAccount-Person Account Layout`** (new *Loyalty & Delivery* section: loyalty balance read-only + default delivery address); **`Account-Bulk_Buyer Layout`**, **`Account-Supplier Layout`** (payment terms, lead time, active-supplier). *Business layouts on both orgs; PA layout dev-only.*
+  - Order: **`Order-Same_Day_B2C Layout`** (kitchen status, same-day flag, payment) vs **`Order-Bulk_Scheduled_B2B Layout`** (source opportunity, scheduled date, payment). *Deployed both orgs.*
+  - [ ] Custom objects: one layout each; surface roll-ups/formulas read-only — **deferred** (auto-generated defaults in use for now). *Metadata.*
+- [ ] **Lightning record pages (FlexiPages)** per object/record type as needed; assign per app/record type — **deferred** (org default record pages in use). *Metadata.*
+- [x] Assign record types → layouts per profile — done for the **4 business/order** record types via a minimal partial **`Admin`** profile (`layoutAssignments` only). Person-account RT cannot be assigned this way (see deviations); §10 profiles/perm sets will add their own assignments. *Deployed both orgs.*
 
 ---
 
@@ -455,13 +459,13 @@ For continuity only — where the automation layer will attach to this model:
 
 ## 14. Suggested execution order (checklist digest)
 
-1. [ ] Prereqs P1–P5 (Dev Hub, Person Accounts, scratch org, settings, standard pricebook).
-2. [ ] Standard-object custom fields + record types (§4) — Account, Lead, Opportunity, Order, Product2. *(Defer `Account.Loyalty_Points_Balance__c` roll-up.)*
-3. [ ] Tier-1 custom objects: `Ingredient__c`, `Recipe__c`, `Delivery_Agent__c` (§5.1–5.3).
-4. [ ] Tier-2 objects & junctions: `Recipe_Ingredient__c`, `Ingredient_Inventory__c`, `Ingredient_Supplier__c`, `Inventory_Reservation__c`, `Purchase_Order__c`, `Purchase_Order_Line__c`, `Delivery__c`, `Feedback__c`, `Loyalty_Point_Transaction__c` (§5.4–5.12), incl. master-detail relationships.
-5. [ ] Roll-ups & formulas (§7): F2 → R3; secondary-MD → R2 → F1; R1.
+1. [x] Prereqs P1–P5 (Dev Hub, Person Accounts, scratch org, settings, standard pricebook).
+2. [x] Standard-object custom fields + record types (§4) — Account, Lead, Opportunity, Order, Product2.
+3. [x] Tier-1 custom objects: `Ingredient__c`, `Recipe__c`, `Delivery_Agent__c` (§5.1–5.3).
+4. [x] Tier-2 objects & junctions: `Recipe_Ingredient__c`, `Ingredient_Inventory__c`, `Ingredient_Supplier__c`, `Inventory_Reservation__c`, `Purchase_Order__c`, `Purchase_Order_Line__c`, `Delivery__c`, `Feedback__c`, `Loyalty_Point_Transaction__c` (§5.4–5.12), incl. master-detail relationships.
+5. [x] Roll-ups & formulas (§7): F2 → R3; secondary-MD → R2 → F1; R1.
 6. [ ] Pricebooks + Product2 menu (§8) — metadata objects now, **seed DATA later**.
-7. [ ] Tabs, app, layouts, Lightning pages per record type (§9).
+7. [~] Tabs, app, layouts, Lightning pages per record type (§9) — tabs, app, and Account/Order record-type layouts + assignment **done**; per-custom-object layouts and Lightning record pages deferred.
 8. [ ] Permission sets → profiles → roles (§10.1–10.2).
 9. [ ] Internal OWD/sharing (§10.3); flag external sharing sets for the site phase.
 10. [ ] `sf project deploy start` to scratch → validate → deploy to `BakerooOrg`.

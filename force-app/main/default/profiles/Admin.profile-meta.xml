@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+    <custom>false</custom>
+    <userLicense>Salesforce</userLicense>
+    <layoutAssignments>
+        <layout>Account-Bulk_Buyer Layout</layout>
+        <recordType>Account.Bulk_Buyer</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Account-Supplier Layout</layout>
+        <recordType>Account.Supplier</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Order-Same_Day_B2C Layout</layout>
+        <recordType>Order.Same_Day_B2C</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Order-Bulk_Scheduled_B2B Layout</layout>
+        <recordType>Order.Bulk_Scheduled_B2B</recordType>
+    </layoutAssignments>
+</Profile>

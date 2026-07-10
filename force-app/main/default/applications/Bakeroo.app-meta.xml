@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#B5651D</headerColor>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <formFactors>Small</formFactors>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
+    <label>Bakeroo</label>
+    <navType>Standard</navType>
+    <tabs>standard-Account</tabs>
+    <tabs>standard-Contact</tabs>
+    <tabs>standard-Lead</tabs>
+    <tabs>standard-Opportunity</tabs>
+    <tabs>standard-Quote</tabs>
+    <tabs>standard-Order</tabs>
+    <tabs>standard-Product2</tabs>
+    <tabs>standard-Pricebook2</tabs>
+    <tabs>Ingredient__c</tabs>
+    <tabs>Recipe__c</tabs>
+    <tabs>Ingredient_Inventory__c</tabs>
+    <tabs>Purchase_Order__c</tabs>
+    <tabs>Delivery__c</tabs>
+    <tabs>Delivery_Agent__c</tabs>
+    <tabs>standard-Case</tabs>
+    <tabs>Feedback__c</tabs>
+    <tabs>Loyalty_Point_Transaction__c</tabs>
+    <tabs>standard-WebCart</tabs>
+    <tabs>standard-report</tabs>
+    <uiType>Lightning</uiType>
+    <utilityBar>Bakeroo_UtilityBar</utilityBar>
+</CustomApplication>
