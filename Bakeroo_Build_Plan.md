@@ -380,6 +380,17 @@ Prefer **minimal profiles + permission sets** for object/field access.
 *Permission sets and (partial) profiles are metadata. Permission-set **assignment** to users is
 often manual or scripted (`sf org assign permset`).*
 
+**Built (both orgs):** `Bakeroo_Sales`, `Bakeroo_Operations`, `Bakeroo_Procurement`,
+`Bakeroo_Delivery_Mgmt`, `Bakeroo_Support` — each with object CRUD + field-level security for its scope
+(roll-up/formula fields read-only). Master-detail dependencies pulled in as read-only masters
+(Operations/Delivery_Mgmt include `Order` R; Procurement includes `Ingredient` R; Support includes
+`Contact` R for `Account`). **`Quote` omitted from `Bakeroo_Sales`** — Quotes not enabled on the orgs
+(enable org-wide first, then add). **`Bakeroo_Customer_Community` deferred** — needs an external
+(Community) license + sharing sets, tied to the Experience Cloud phase. Not yet assigned to users
+(no role users exist yet; admin retains full access via `Bakeroo_All_Fields`).
+- [ ] Profiles: `Bakeroo Internal` (minimal clone) + community profile — **not yet built.**
+- [ ] Roles (§10.1) + OWD/sharing (§10.3) — **not yet built.**
+
 ### 10.3 Org-wide defaults / sharing
 
 | Object | Internal OWD | External OWD | Rationale |
@@ -399,6 +410,25 @@ often manual or scripted (`sf org assign permset`).*
   Cloud users is configured in the **Experience workspace and is largely manual / not cleanly
   deployable** — flagged, and tied to the (out-of-scope) site build. For now, plan the **internal**
   OWD/sharing; external sharing sets are a boundary item that lands with the site.
+
+**Status — OWD:**
+- **Custom objects (both orgs, via metadata):** `Ingredient__c` and `Recipe__c` changed `ReadWrite → Private`.
+  All other custom objects were already correct — details are `ControlledByParent` (Recipe_Ingredient,
+  Ingredient_Inventory, Ingredient_Supplier, Inventory_Reservation, Purchase_Order_Line, Delivery,
+  Loyalty_Point_Transaction), standalones `Private` (Delivery_Agent, Feedback, Purchase_Order).
+- **Standard objects — `BakerooScratch` only (via metadata):** `Account`, `Opportunity`, `Order`, `Case`
+  → **Private**; `Product2` → **Public Read Only** (`sharingModel` enum `Read`). *Setting `Account` Private
+  forces `Opportunity` off `ReadWrite` (child OWD can't exceed Account) → `Opportunity` set Private too.*
+  These standard `object-meta.xml` files were **intentionally NOT kept in source** (repo convention avoids
+  standard object-metas; change is org-config, not tracked).
+- **Standard objects — `BakerooOrg`: DO MANUALLY** (persistent org, impactful sharing recalc). *Setup →
+  Security → Sharing Settings → Edit:* set **Account = Private, Opportunity = Private, Order = Private,
+  Case = Private, Product2 = Public Read Only**. (`Contact` follows Account under Person Accounts =
+  Controlled by Parent; `OrderItem`/`Pricebook2` use parent/"Use"-based access — leave.)
+- **No sharing rules needed now** — role hierarchy + OWD cover internal visibility; external sharing sets
+  are deferred to the Experience Cloud phase.
+- **Not assigned:** roles/permission sets/`Bakeroo Internal` profile aren't attached to users yet (no role
+  users exist); admin retains full access via `Bakeroo_All_Fields`.
 
 ---
 

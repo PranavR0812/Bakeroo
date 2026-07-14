@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Bakeroo Delivery Mgmt</label>
+    <description>Last-mile: Delivery, Delivery_Agent (R/W); Order (R, master of Delivery). Assigned to Delivery Manager.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+
+    <!-- Objects (R/W) -->
+    <objectPermissions><object>Delivery__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Delivery_Agent__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <!-- Order (R) — master of Delivery__c -->
+    <objectPermissions><object>Order</object><allowRead>true</allowRead><allowCreate>false</allowCreate><allowEdit>false</allowEdit><allowDelete>false</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+
+    <!-- Delivery__c (R/W) -->
+    <fieldPermissions><field>Delivery__c.Delivered_At__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery__c.Delivery_Address__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery__c.Delivery_Agent__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery__c.Scheduled_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery__c.Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <!-- Delivery_Agent__c (R/W) -->
+    <fieldPermissions><field>Delivery_Agent__c.Active__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery_Agent__c.Delivery_Manager__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery_Agent__c.Is_Available__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery_Agent__c.Phone__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <!-- Order (R) -->
+    <fieldPermissions><field>Order.Delivery_Address__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Kitchen_Status__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Order_Type__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Payment_Status__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Same_Day_Flag__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Scheduled_Delivery_Date__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+</PermissionSet>

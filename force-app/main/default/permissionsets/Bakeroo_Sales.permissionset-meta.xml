@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Bakeroo Sales</label>
+    <description>B2B pipeline: Lead, Opportunity, Order (R/W); Product2, Pricebook (R). Assigned to Sales Manager / Sales Rep. (Quote omitted until Quotes is enabled org-wide.)</description>
+    <hasActivationRequired>false</hasActivationRequired>
+
+    <!-- Objects -->
+    <objectPermissions><object>Lead</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Opportunity</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Order</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Product2</object><allowRead>true</allowRead><allowCreate>false</allowCreate><allowEdit>false</allowEdit><allowDelete>false</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Pricebook2</object><allowRead>true</allowRead><allowCreate>false</allowCreate><allowEdit>false</allowEdit><allowDelete>false</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+
+    <!-- Lead (R/W) -->
+    <fieldPermissions><field>Lead.Bulk_Source__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Lead.Estimated_Quantity__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Lead.Items_of_Interest__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Lead.Requested_Delivery_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <!-- Opportunity (R/W) -->
+    <fieldPermissions><field>Opportunity.Deposit_Amount__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Opportunity.Deposit_Paid__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Opportunity.Feasibility_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Opportunity.Requested_Delivery_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Opportunity.Total_Quantity__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <!-- Order (R/W) -->
+    <fieldPermissions><field>Order.Delivery_Address__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Kitchen_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Order_Type__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Payment_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Same_Day_Flag__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Scheduled_Delivery_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Source_Opportunity__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <!-- Product2 (R) -->
+    <fieldPermissions><field>Product2.Category__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Product2.Is_Available__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Product2.Prep_Time_Min__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+</PermissionSet>

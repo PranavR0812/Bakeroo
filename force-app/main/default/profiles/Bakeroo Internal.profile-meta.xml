@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+    <custom>true</custom>
+    <userLicense>Salesforce</userLicense>
+    <description>Minimal base profile for internal Bakeroo staff (SM/SR/OM/SE/Delivery Mgr/MD). Object and field access is granted via the function permission sets (Bakeroo_Sales, Bakeroo_Operations, etc.), not here.</description>
+</Profile>

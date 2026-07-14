@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Bakeroo Procurement</label>
+    <description>Supplier procurement: Purchase_Order(+Line), Ingredient_Supplier (R/W); Ingredient (R, master of Ingredient_Supplier). Assigned to Operations Manager (can be folded into Bakeroo Operations).</description>
+    <hasActivationRequired>false</hasActivationRequired>
+
+    <!-- Objects (R/W) -->
+    <objectPermissions><object>Purchase_Order__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Purchase_Order_Line__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Ingredient_Supplier__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <!-- Ingredient (R) — master of Ingredient_Supplier__c -->
+    <objectPermissions><object>Ingredient__c</object><allowRead>true</allowRead><allowCreate>false</allowCreate><allowEdit>false</allowEdit><allowDelete>false</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+
+    <!-- Purchase_Order__c (R/W; roll-up read-only) -->
+    <fieldPermissions><field>Purchase_Order__c.Approval_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Expected_Delivery_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Linked_Order__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Needed_By_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Source__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Supplier__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Total__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <!-- Purchase_Order_Line__c (R/W; formula read-only) -->
+    <fieldPermissions><field>Purchase_Order_Line__c.Ingredient__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Line_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Quantity_Ordered__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Quantity_Received__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Unit_Price__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Line_Total__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <!-- Ingredient_Supplier__c (R/W) -->
+    <fieldPermissions><field>Ingredient_Supplier__c.Is_Preferred__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Supplier__c.Lead_Time_Days__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Supplier__c.Min_Order_Qty__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Supplier__c.Supplier__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Supplier__c.Unit_Price__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <!-- Ingredient__c (R) -->
+    <fieldPermissions><field>Ingredient__c.Is_Perishable__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient__c.Preferred_Supplier__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient__c.Unit_of_Measure__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+</PermissionSet>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Bakeroo Support</label>
+    <description>Service Cloud: Case (R/W); Account, Order (R). Contact (R) included because Account Read depends on it. Assigned to Support Executive.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+
+    <!-- Case (R/W) -->
+    <objectPermissions><object>Case</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>false</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <!-- Account / Contact / Order (R) -->
+    <objectPermissions><object>Account</object><allowRead>true</allowRead><allowCreate>false</allowCreate><allowEdit>false</allowEdit><allowDelete>false</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Contact</object><allowRead>true</allowRead><allowCreate>false</allowCreate><allowEdit>false</allowEdit><allowDelete>false</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Order</object><allowRead>true</allowRead><allowCreate>false</allowCreate><allowEdit>false</allowEdit><allowDelete>false</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+
+    <!-- Account (R) -->
+    <fieldPermissions><field>Account.Active_Supplier__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Account.Default_Delivery_Address__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Account.Default_Lead_Time_Days__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Account.Loyalty_Points_Balance__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Account.Payment_Terms__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <!-- Order (R) -->
+    <fieldPermissions><field>Order.Delivery_Address__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Kitchen_Status__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Order_Type__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Payment_Status__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Same_Day_Flag__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Scheduled_Delivery_Date__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Source_Opportunity__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+</PermissionSet>

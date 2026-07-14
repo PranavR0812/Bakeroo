@@ -112,6 +112,14 @@ sf data query -o <org> -q "SELECT …"
   **`Bakeroo_All_Fields`** perm set covers every custom field and is assigned to admin on both orgs.
   This bit the whole model (Product2/Order/Account fields were invisible until it was assigned).
   Roll-up (`Summary`) and formula fields must be `<editable>false</editable>` in FLS.
+- **OWD `sharingModel` enum + cascade.** "Public Read Only" is `Read` (not `ReadOnly`); "Public Read/Write"
+  is `ReadWrite`. Setting **`Account` = Private cascades** — child OWDs can't be more open than Account, so
+  `Opportunity`/`Case`/`Contract` must also drop off `ReadWrite`. Under Person Accounts, `Contact` is forced
+  `ControlledByParent`. Standard-object OWD is settable via a minimal `<CustomObject><sharingModel>` object-meta,
+  but **we don't keep standard object-metas in source** — set standard OWD in Setup → Sharing Settings instead
+  (esp. on the persistent `BakerooOrg`, where it triggers a sharing recalc). A permission-set `objectPermissions`
+  entry for a **detail** object requires the **master's** object permission in the same set (and `Account` Read
+  pulls in `Contact` Read).
 - **Assign layouts via a *minimal partial* profile** — deploy a `Profile` file containing only
   `<custom>`, `<userLicense>`, and the `<layoutAssignments>` you want. Do **not** retrieve+redeploy
   the full profile (Admin is ~893 lines) — the partial merges the assignments without touching other
@@ -203,9 +211,32 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   5 `Recipe__c` linked to products, 21 `Recipe_Ingredient__c` rows with quantities. Roll-ups/formulas
   (`Quantity_Available__c`, etc.) verified populating.
 
-**Not yet done:** §9 remainder (per-object layouts, FlexiPages) · §10 permission sets/profiles/roles/OWD-sharing
-(the `Bakeroo_All_Fields` set is an interim FLS fix; the granular function sets are still to build) ·
-the automation phase.
+**§10 function permission sets (DONE, both orgs):**
+- Built `Bakeroo_Sales`, `Bakeroo_Operations`, `Bakeroo_Procurement`, `Bakeroo_Delivery_Mgmt`, `Bakeroo_Support`
+  — object CRUD + FLS scoped per §10.2 (roll-up/formula fields read-only). Master-detail dependencies included
+  as read-only masters (Operations/Delivery_Mgmt add `Order` R; Procurement adds `Ingredient` R; Support adds
+  `Contact` R for `Account`).
+- **`Quote` omitted** from `Bakeroo_Sales` — Quotes not enabled on the orgs; enable org-wide before adding.
+- **`Bakeroo_Customer_Community` deferred** — needs external (Community) license + sharing sets (Experience Cloud phase).
+- Not yet assigned to users (no role users exist; admin keeps full access via `Bakeroo_All_Fields`).
+
+**§10 roles, profile & OWD (mostly DONE):**
+- **Roles (§10.1, both orgs):** `Managing_Director` › (`Sales_Manager` › `Sales_Rep`) + (`Operations_Manager`
+  › `Support_Executive`, `Delivery_Manager`).
+- **Profile (§10.2, both orgs):** minimal `Bakeroo Internal` (custom, `Salesforce` license) — object/field
+  access comes from the function permission sets, not the profile.
+- **Custom-object OWD (§10.3, both orgs):** `Ingredient__c` + `Recipe__c` `ReadWrite → Private`; all other
+  custom objects already correct.
+- **Standard-object OWD (§10.3):** applied to **`BakerooScratch` only** via metadata (`Account`/`Opportunity`/
+  `Order`/`Case` = Private, `Product2` = Public Read Only). The standard `object-meta.xml` files were
+  **deliberately not kept in source** (repo convention). **On `BakerooOrg` this is a MANUAL Setup step**
+  (Sharing Settings) — impactful recalc on the persistent org; see Build Plan §10.3 for exact values.
+- Setting `Account` Private **cascades**: `Opportunity` (and any child OWD) can't exceed `Account`, so
+  Opportunity had to move off `ReadWrite`. `sharingModel` enum for "Public Read Only" is **`Read`** (not `ReadOnly`).
+- Nothing is assigned to users yet (no role users); admin keeps access via `Bakeroo_All_Fields`.
+
+**Not yet done:** §9 remainder (per-object layouts, FlexiPages) · §10 remainder (community profile +
+external sharing sets — Experience Cloud phase; **manual standard-OWD on `BakerooOrg`**) · the automation phase.
 
 **Known open items:**
 - OWD inconsistency: dev-built objects are `ReadWrite`; scaffolded ones `Private`/`ControlledByParent`
