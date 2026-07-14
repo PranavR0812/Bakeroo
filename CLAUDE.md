@@ -104,6 +104,14 @@ sf data query -o <org> -q "SELECT …"
   `Layout:PersonAccount-Person Account Layout` and editing it.
 - **`CustomTab` needs a valid `motif`** (icon), e.g. `Custom53: Bread`; an invalid name fails deploy.
   Junctions and line-item objects (`Recipe_Ingredient__c`, `Purchase_Order_Line__c`, …) get **no tab**.
+- **Deployed custom fields get NO field-level security.** A custom field created in the UI auto-grants
+  FLS to your profile; a field pushed via `sf project deploy` grants FLS to **nobody** — *except* `required`
+  and master-detail fields, which are auto-visible. Symptom: `FieldDefinition` (Tooling) lists the field,
+  but `sf sobject describe` / SOQL-select / Apex / DML all say **"No such column / Field does not exist"**
+  (describe honours FLS; Tooling doesn't). Fix by granting FLS via a permission set — the broad
+  **`Bakeroo_All_Fields`** perm set covers every custom field and is assigned to admin on both orgs.
+  This bit the whole model (Product2/Order/Account fields were invisible until it was assigned).
+  Roll-up (`Summary`) and formula fields must be `<editable>false</editable>` in FLS.
 - **Assign layouts via a *minimal partial* profile** — deploy a `Profile` file containing only
   `<custom>`, `<userLicense>`, and the `<layoutAssignments>` you want. Do **not** retrieve+redeploy
   the full profile (Admin is ~893 lines) — the partial merges the assignments without touching other
@@ -183,11 +191,28 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   `PersonAccount-Person Account Layout` customized with a *Loyalty & Delivery* section (dev-only).
 - **Deferred:** per-custom-object layouts (auto-generated defaults in use) and Lightning record pages.
 
-**Not yet done:** §8 pricebook + Product2 menu data · §9 remainder (per-object layouts, FlexiPages) ·
-§10 permission sets/profiles/roles/OWD-sharing · the automation phase.
+**§8 pricebook + menu data (DONE, both orgs):**
+- Added missing `Recipe_Ingredient__c.Quantity_Required__c` (Number) — the load-bearing junction quantity
+  was specified in Build Plan §5.4 but never built.
+- **Fixed a pervasive FLS gap** — deployed optional custom fields had no field-level security, so the admin
+  couldn't see/load most of the model. New broad permission set **`Bakeroo_All_Fields`** (Read/Edit on all
+  custom fields, RO on roll-up/formula, CRUD on custom objects), assigned to admin on both orgs. See gotcha.
+- Activated the (previously inactive) **Standard Pricebook**; created active **`Bakeroo Menu`** Pricebook2.
+- Seeded a small farm-to-table dataset via re-runnable `scripts/apex/seed_menu_data.apex`: 10 `Ingredient__c`
+  + inventory rows, 5 `Product2` menu items (across categories) with Standard + Bakeroo Menu price entries,
+  5 `Recipe__c` linked to products, 21 `Recipe_Ingredient__c` rows with quantities. Roll-ups/formulas
+  (`Quantity_Available__c`, etc.) verified populating.
+
+**Not yet done:** §9 remainder (per-object layouts, FlexiPages) · §10 permission sets/profiles/roles/OWD-sharing
+(the `Bakeroo_All_Fields` set is an interim FLS fix; the granular function sets are still to build) ·
+the automation phase.
 
 **Known open items:**
 - OWD inconsistency: dev-built objects are `ReadWrite`; scaffolded ones `Private`/`ControlledByParent`
   — reconcile in §10.
 - Address fields are `TextArea` (no custom compound-address type).
 - Lead→Opportunity field mapping still to be done manually.
+- **`BakerooOrg` has leftover stock sample data** — ~17 `GenWatt`/`SLA`/`Installation` `Product2` rows on a
+  stray active custom pricebook literally named **"Standard"** (not the real Standard Pricebook). Pre-existing,
+  untouched by the seed; clean up if/when it clutters the menu. Scratch is clean.
+- `Recipe_Ingredient__c.Unit__c` (Build Plan §5.4) still unbuilt — deferred (unit derivable from ingredient UoM).

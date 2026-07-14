@@ -193,8 +193,8 @@ CreatedDate, Owner) assumed. All API names carry `__c`; junctions named `<A>_<B>
 #### 5.4 `Recipe_Ingredient__c` — **junction** (Recipe ↔ Ingredient) — load-bearing
 - [ ] `Recipe__c` — **Master-Detail(Recipe__c)** ← *primary master; create Recipe__c first (5.2)*
 - [ ] `Ingredient__c` — **Lookup(Ingredient__c)**  *(per doc; not MD — Recipe is the owning parent)*
-- [ ] `Quantity_Required__c` — Number *(per recipe yield)*
-- [ ] `Unit__c` — Picklist (matches ingredient UoM)
+- [x] `Quantity_Required__c` — Number *(per recipe yield)* — **was missing from prior build; added §8, deployed both orgs.**
+- [ ] `Unit__c` — Picklist (matches ingredient UoM) — *still deferred (unit derivable from ingredient UoM for now).*
 
 #### 5.5 `Ingredient_Inventory__c` (stock rows — 1 per ingredient in V1)
 - [ ] `Ingredient__c` — **Master-Detail(Ingredient__c)** ← *create Ingredient__c first (5.1)*
@@ -308,11 +308,17 @@ implemented as a two-master junction (Order + Ingredient_Inventory) — see gotc
 
 ## 8. Pricebooks & Product2 menu setup
 
-- [ ] **Standard Pricebook** — present by default; must be **active**. *DATA/config, not metadata.*
-- [ ] **Menu products** — create `Product2` records for menu items with `Category__c`, `Prep_Time_Min__c`, `Is_Available__c`. *These are **DATA**, loaded via `sf data import` / Data Loader — not metadata.*
-- [ ] **Standard Pricebook Entry** for each Product2 (**required before** any custom pricebook entry). *DATA.*
-- [ ] **`Bakeroo Menu` custom Pricebook2** (optional but recommended so the storefront reads a dedicated catalog) + PricebookEntry per product. *Pricebook2 object def can be metadata; entries are DATA.*
-- [ ] Link each product to its `Recipe__c` (`Recipe__c.Product__c`) — recipe + `Recipe_Ingredient__c` rows are DATA.
+- [x] **Standard Pricebook** — was **inactive** in both orgs; activated via the seed script (Apex `update Pricebook2.IsActive`). *DATA/config, not metadata.*
+- [x] **Menu products** — 5 `Product2` menu items across categories (Breads/Pastries/Cakes/Beverages) with `Category__c`, `Prep_Time_Min__c`, `Is_Available__c`. Loaded via `scripts/apex/seed_menu_data.apex` (re-runnable) on both orgs.
+- [x] **Standard Pricebook Entry** for each Product2. *DATA.*
+- [x] **`Bakeroo Menu` custom Pricebook2** + PricebookEntry per product (D2C catalog). Both orgs.
+- [x] Link each product to its `Recipe__c` (`Recipe__c.Product__c`) — 5 recipes + 21 `Recipe_Ingredient__c` rows (with `Quantity_Required__c`), 10 `Ingredient__c` + inventory rows. Both orgs.
+
+> **Prereq surfaced during §8 — FLS gap.** Optional custom fields deployed via metadata get **no field-level
+> security** (only `required`/master-detail fields auto-grant it), so the admin couldn't see or load most of
+> the model. Fixed with a broad **`Bakeroo_All_Fields`** permission set (Read/Edit FLS on all custom fields,
+> RO on roll-up/formula, CRUD on custom objects), assigned to admin on both orgs. The granular §10 function
+> permission sets layer on top later.
 
 > **Boundary:** the Commerce WebStore/WebCart and the Experience Cloud storefront that *consume*
 > this pricebook are **out of scope** (next phases). We only stand up Product2 + pricebook here.

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Bakeroo All Fields</label>
+    <description>Read/Edit FLS on every custom field + CRUD on custom objects. Fixes the metadata-deploy FLS gap (deployed optional fields get no FLS). Assigned to admin so the model is visible/loadable; the granular section 10 function permission sets layer on top.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+
+    <!-- ===== Object CRUD ===== -->
+    <!-- Standard masters required by detail objects (Delivery/Inventory_Reservation -> Order, Loyalty -> Account) -->
+    <objectPermissions><object>Account</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Contact</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Order</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Delivery__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Delivery_Agent__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Feedback__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Ingredient__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Ingredient_Inventory__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Ingredient_Supplier__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Inventory_Reservation__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Loyalty_Point_Transaction__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Purchase_Order__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Purchase_Order_Line__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Recipe__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+    <objectPermissions><object>Recipe_Ingredient__c</object><allowRead>true</allowRead><allowCreate>true</allowCreate><allowEdit>true</allowEdit><allowDelete>true</allowDelete><viewAllRecords>false</viewAllRecords><modifyAllRecords>false</modifyAllRecords></objectPermissions>
+
+    <!-- ===== Account ===== -->
+    <fieldPermissions><field>Account.Active_Supplier__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Account.Default_Delivery_Address__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Account.Default_Lead_Time_Days__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Account.Loyalty_Points_Balance__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Account.Payment_Terms__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Delivery__c ===== -->
+    <fieldPermissions><field>Delivery__c.Delivered_At__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery__c.Delivery_Address__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery__c.Delivery_Agent__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery__c.Scheduled_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery__c.Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Delivery_Agent__c ===== -->
+    <fieldPermissions><field>Delivery_Agent__c.Active__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery_Agent__c.Delivery_Manager__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery_Agent__c.Is_Available__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Delivery_Agent__c.Phone__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Feedback__c ===== -->
+    <fieldPermissions><field>Feedback__c.Comments__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Feedback__c.Customer__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Feedback__c.Order__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Feedback__c.Rating__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Ingredient__c ===== -->
+    <fieldPermissions><field>Ingredient__c.Is_Perishable__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient__c.Preferred_Supplier__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient__c.Unit_of_Measure__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Ingredient_Inventory__c ===== -->
+    <fieldPermissions><field>Ingredient_Inventory__c.Quantity_Available__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Inventory__c.Quantity_On_Hand__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Inventory__c.Quantity_Reserved__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+
+    <!-- ===== Ingredient_Supplier__c ===== -->
+    <fieldPermissions><field>Ingredient_Supplier__c.Is_Preferred__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Supplier__c.Lead_Time_Days__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Supplier__c.Min_Order_Qty__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Supplier__c.Supplier__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Ingredient_Supplier__c.Unit_Price__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Inventory_Reservation__c ===== -->
+    <fieldPermissions><field>Inventory_Reservation__c.Needed_By_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Inventory_Reservation__c.Quantity__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Inventory_Reservation__c.Reservation_Type__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Inventory_Reservation__c.Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Lead ===== -->
+    <fieldPermissions><field>Lead.Bulk_Source__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Lead.Estimated_Quantity__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Lead.Items_of_Interest__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Lead.Requested_Delivery_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Loyalty_Point_Transaction__c ===== -->
+    <fieldPermissions><field>Loyalty_Point_Transaction__c.Order__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Loyalty_Point_Transaction__c.Points__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Loyalty_Point_Transaction__c.Type__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Opportunity ===== -->
+    <fieldPermissions><field>Opportunity.Deposit_Amount__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Opportunity.Deposit_Paid__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Opportunity.Feasibility_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Opportunity.Requested_Delivery_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Opportunity.Total_Quantity__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Order ===== -->
+    <fieldPermissions><field>Order.Delivery_Address__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Kitchen_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Order_Type__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Payment_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Same_Day_Flag__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Scheduled_Delivery_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Order.Source_Opportunity__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Product2 ===== -->
+    <fieldPermissions><field>Product2.Category__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Product2.Is_Available__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Product2.Prep_Time_Min__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Purchase_Order__c ===== -->
+    <fieldPermissions><field>Purchase_Order__c.Approval_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Expected_Delivery_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Linked_Order__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Needed_By_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Source__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Supplier__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order__c.Total__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+
+    <!-- ===== Purchase_Order_Line__c ===== -->
+    <fieldPermissions><field>Purchase_Order_Line__c.Ingredient__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Line_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Line_Total__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Quantity_Ordered__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Quantity_Received__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Purchase_Order_Line__c.Unit_Price__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Recipe__c ===== -->
+    <fieldPermissions><field>Recipe__c.Active__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Recipe__c.Product__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+
+    <!-- ===== Recipe_Ingredient__c ===== -->
+    <fieldPermissions><field>Recipe_Ingredient__c.Ingredient__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+</PermissionSet>
