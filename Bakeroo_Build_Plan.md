@@ -341,7 +341,12 @@ implemented as a two-master junction (Order + Ingredient_Inventory) — see gotc
     auto-number Names set **Readonly**. Overwrites the auto-generated default layout (same name → no profile
     reassignment). *Deployed both orgs.* Junctions + line-items (`Recipe_Ingredient__c`, `Ingredient_Supplier__c`,
     `Inventory_Reservation__c`, `Purchase_Order_Line__c`) keep auto-generated defaults (no tab). *Metadata.*
-- [ ] **Lightning record pages (FlexiPages)** per object/record type as needed; assign per app/record type — **deferred** (org default record pages in use). *Metadata.*
+- [x] **Lightning record pages (FlexiPages)** — built one record page per **tab'd custom object** (8), each on
+  `flexipage:recordHomeTemplateDesktop`: highlights-panel header + a tabset with **Details** (`force:detailPanel`,
+  renders the §9 page layout) and **Related** (`force:relatedListContainer`). Assigned as the **org-default desktop
+  record page** via a `View`/`Large`/`Flexipage` **`actionOverride`** on each object's `object-meta.xml` (deployable —
+  no manual App Builder activation). *Deployed both orgs.* Standalone pages take **no** `<mode>` on regions/facets
+  (Replace needs a `parentFlexiPage`). Junctions/line-items keep org default pages. *Metadata.*
 - [x] Assign record types → layouts per profile — done for the **4 business/order** record types via a minimal partial **`Admin`** profile (`layoutAssignments` only). Person-account RT cannot be assigned this way (see deviations); §10 profiles/perm sets will add their own assignments. *Deployed both orgs.*
 
 ---
@@ -508,7 +513,7 @@ For continuity only — where the automation layer will attach to this model:
 4. [x] Tier-2 objects & junctions: `Recipe_Ingredient__c`, `Ingredient_Inventory__c`, `Ingredient_Supplier__c`, `Inventory_Reservation__c`, `Purchase_Order__c`, `Purchase_Order_Line__c`, `Delivery__c`, `Feedback__c`, `Loyalty_Point_Transaction__c` (§5.4–5.12), incl. master-detail relationships.
 5. [x] Roll-ups & formulas (§7): F2 → R3; secondary-MD → R2 → F1; R1.
 6. [ ] Pricebooks + Product2 menu (§8) — metadata objects now, **seed DATA later**.
-7. [~] Tabs, app, layouts, Lightning pages per record type (§9) — tabs, app, Account/Order record-type layouts + assignment, and **per-custom-object layouts (8 tab'd objects)** all **done**; only Lightning record pages (FlexiPages) deferred.
+7. [x] Tabs, app, layouts, Lightning pages per record type (§9) — tabs, app, Account/Order record-type layouts + assignment, **per-custom-object layouts (8 tab'd objects)**, and **Lightning record pages (FlexiPages, 8, org-default assigned)** all **done**, both orgs.
 8. [ ] Permission sets → profiles → roles (§10.1–10.2).
 9. [x] Internal OWD/sharing (§10.3) — done both orgs (`BakerooOrg` standard OWD set manually & verified 2026-07-16); external sharing sets flagged for the site phase.
 10. [ ] `sf project deploy start` to scratch → validate → deploy to `BakerooOrg`.

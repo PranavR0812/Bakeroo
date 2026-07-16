@@ -104,6 +104,17 @@ sf data query -o <org> -q "SELECT …"
   `Layout:PersonAccount-Person Account Layout` and editing it.
 - **`CustomTab` needs a valid `motif`** (icon), e.g. `Custom53: Bread`; an invalid name fails deploy.
   Junctions and line-item objects (`Recipe_Ingredient__c`, `Purchase_Order_Line__c`, …) get **no tab**.
+- **Standalone FlexiPages (record pages) take NO `<mode>` on regions or facets.** `<mode>Replace</mode>` only
+  works when a `<parentFlexiPage>` exists (App-Builder clones); on a fresh page built on a bare template
+  (`flexipage:recordHomeTemplateDesktop`) it fails deploy — *"specifies mode 'REPLACE' but a parent region
+  enabling that mode doesn't exist."* Also: each `<itemInstances>` holds exactly **one** `<componentInstance>`
+  (two → *"componentInstance is duplicated"*) — put sibling tabs in separate `<itemInstances>`.
+- **Record-page assignment IS deployable** — no manual App Builder activation. Set the org-default desktop page
+  by adding a `View` / `formFactor Large` / `type Flexipage` (`<content>PageDevName</content>`) **`actionOverride`**
+  to the object's `object-meta.xml`. Scaffolded custom objects have no `actionOverrides` (insert the block after
+  the `<CustomObject>` tag); dev-retrieved ones (`Ingredient__c`, `Recipe__c`) already carry a `View/Large/Default`
+  block — flip it to `Flexipage`. **Note dev-retrieved object-metas use LF, scaffolded ones CRLF** — a CRLF-based
+  bulk string replace silently misses the LF files.
 - **Deployed custom fields get NO field-level security.** A custom field created in the UI auto-grants
   FLS to your profile; a field pushed via `sf project deploy` grants FLS to **nobody** — *except* `required`
   and master-detail fields, which are auto-visible. Symptom: `FieldDefinition` (Tooling) lists the field,
@@ -202,7 +213,10 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   fields grouped into named sections, roll-ups/formulas (`Quantity_Available__c`, `Quantity_Reserved__c`,
   `Total__c`) + auto-number Names set **Readonly**. Kept each layout's default *name* so the assignment is
   automatic (no profile change). *Deployed both orgs.* Junctions + line-items keep auto-generated defaults.
-- **Deferred:** Lightning record pages (FlexiPages) per object/record type — org default record pages in use.
+- Lightning record pages (FlexiPages): one per **tab'd custom object** (8) on `flexipage:recordHomeTemplateDesktop`
+  — highlights-panel header + a tabset with **Details** (`force:detailPanel`, renders the §9 layout) and **Related**
+  (`force:relatedListContainer`). Assigned as **org-default desktop record page** via a `View`/`Large`/`Flexipage`
+  `actionOverride` on each `object-meta.xml` (deployable — no manual activation). *Both orgs.* See FlexiPage gotcha.
 
 **§8 pricebook + menu data (DONE, both orgs):**
 - Added missing `Recipe_Ingredient__c.Quantity_Required__c` (Number) — the load-bearing junction quantity
@@ -240,8 +254,8 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   Opportunity had to move off `ReadWrite`. `sharingModel` enum for "Public Read Only" is **`Read`** (not `ReadOnly`).
 - Nothing is assigned to users yet (no role users); admin keeps access via `Bakeroo_All_Fields`.
 
-**Not yet done:** §9 remainder (FlexiPages / Lightning record pages) · §10 remainder (community profile +
-external sharing sets — Experience Cloud phase) · the automation phase.
+**Not yet done:** §9 **complete** · §10 remainder (community profile + external sharing sets — Experience
+Cloud phase) · the automation phase.
 
 **Known open items:**
 - OWD inconsistency: dev-built objects are `ReadWrite`; scaffolded ones `Private`/`ControlledByParent`
