@@ -335,7 +335,12 @@ implemented as a two-master junction (Order + Ingredient_Inventory) — see gotc
 - [x] **Page layouts per record type:**
   - Account: **Customer** — done via the dedicated **`PersonAccount-Person Account Layout`** (new *Loyalty & Delivery* section: loyalty balance read-only + default delivery address); **`Account-Bulk_Buyer Layout`**, **`Account-Supplier Layout`** (payment terms, lead time, active-supplier). *Business layouts on both orgs; PA layout dev-only.*
   - Order: **`Order-Same_Day_B2C Layout`** (kitchen status, same-day flag, payment) vs **`Order-Bulk_Scheduled_B2B Layout`** (source opportunity, scheduled date, payment). *Deployed both orgs.*
-  - [ ] Custom objects: one layout each; surface roll-ups/formulas read-only — **deferred** (auto-generated defaults in use for now). *Metadata.*
+  - [x] Custom objects: one layout each for the **8 tab'd objects** (Ingredient, Recipe, Ingredient_Inventory,
+    Purchase_Order, Delivery, Delivery_Agent, Feedback, Loyalty_Point_Transaction) — fields grouped into
+    named sections; roll-ups/formulas (`Quantity_Available__c`, `Quantity_Reserved__c`, `Total__c`) and
+    auto-number Names set **Readonly**. Overwrites the auto-generated default layout (same name → no profile
+    reassignment). *Deployed both orgs.* Junctions + line-items (`Recipe_Ingredient__c`, `Ingredient_Supplier__c`,
+    `Inventory_Reservation__c`, `Purchase_Order_Line__c`) keep auto-generated defaults (no tab). *Metadata.*
 - [ ] **Lightning record pages (FlexiPages)** per object/record type as needed; assign per app/record type — **deferred** (org default record pages in use). *Metadata.*
 - [x] Assign record types → layouts per profile — done for the **4 business/order** record types via a minimal partial **`Admin`** profile (`layoutAssignments` only). Person-account RT cannot be assigned this way (see deviations); §10 profiles/perm sets will add their own assignments. *Deployed both orgs.*
 
@@ -503,7 +508,7 @@ For continuity only — where the automation layer will attach to this model:
 4. [x] Tier-2 objects & junctions: `Recipe_Ingredient__c`, `Ingredient_Inventory__c`, `Ingredient_Supplier__c`, `Inventory_Reservation__c`, `Purchase_Order__c`, `Purchase_Order_Line__c`, `Delivery__c`, `Feedback__c`, `Loyalty_Point_Transaction__c` (§5.4–5.12), incl. master-detail relationships.
 5. [x] Roll-ups & formulas (§7): F2 → R3; secondary-MD → R2 → F1; R1.
 6. [ ] Pricebooks + Product2 menu (§8) — metadata objects now, **seed DATA later**.
-7. [~] Tabs, app, layouts, Lightning pages per record type (§9) — tabs, app, and Account/Order record-type layouts + assignment **done**; per-custom-object layouts and Lightning record pages deferred.
+7. [~] Tabs, app, layouts, Lightning pages per record type (§9) — tabs, app, Account/Order record-type layouts + assignment, and **per-custom-object layouts (8 tab'd objects)** all **done**; only Lightning record pages (FlexiPages) deferred.
 8. [ ] Permission sets → profiles → roles (§10.1–10.2).
 9. [x] Internal OWD/sharing (§10.3) — done both orgs (`BakerooOrg` standard OWD set manually & verified 2026-07-16); external sharing sets flagged for the site phase.
 10. [ ] `sf project deploy start` to scratch → validate → deploy to `BakerooOrg`.

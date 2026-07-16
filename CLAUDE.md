@@ -197,7 +197,12 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
 - Record-type layouts: `Order-Same_Day_B2C`, `Order-Bulk_Scheduled_B2B`, `Account-Bulk_Buyer`,
   `Account-Supplier` (built + assigned via a minimal partial `Admin` profile, both orgs);
   `PersonAccount-Person Account Layout` customized with a *Loyalty & Delivery* section (dev-only).
-- **Deferred:** per-custom-object layouts (auto-generated defaults in use) and Lightning record pages.
+- Per-custom-object layouts: reworked the default layout for the **8 tab'd objects** (Ingredient, Recipe,
+  Ingredient_Inventory, Purchase_Order, Delivery, Delivery_Agent, Feedback, Loyalty_Point_Transaction) —
+  fields grouped into named sections, roll-ups/formulas (`Quantity_Available__c`, `Quantity_Reserved__c`,
+  `Total__c`) + auto-number Names set **Readonly**. Kept each layout's default *name* so the assignment is
+  automatic (no profile change). *Deployed both orgs.* Junctions + line-items keep auto-generated defaults.
+- **Deferred:** Lightning record pages (FlexiPages) per object/record type — org default record pages in use.
 
 **§8 pricebook + menu data (DONE, both orgs):**
 - Added missing `Recipe_Ingredient__c.Quantity_Required__c` (Number) — the load-bearing junction quantity
@@ -235,7 +240,7 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   Opportunity had to move off `ReadWrite`. `sharingModel` enum for "Public Read Only" is **`Read`** (not `ReadOnly`).
 - Nothing is assigned to users yet (no role users); admin keeps access via `Bakeroo_All_Fields`.
 
-**Not yet done:** §9 remainder (per-object layouts, FlexiPages) · §10 remainder (community profile +
+**Not yet done:** §9 remainder (FlexiPages / Lightning record pages) · §10 remainder (community profile +
 external sharing sets — Experience Cloud phase) · the automation phase.
 
 **Known open items:**
