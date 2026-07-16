@@ -227,16 +227,16 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   access comes from the function permission sets, not the profile.
 - **Custom-object OWD (§10.3, both orgs):** `Ingredient__c` + `Recipe__c` `ReadWrite → Private`; all other
   custom objects already correct.
-- **Standard-object OWD (§10.3):** applied to **`BakerooScratch` only** via metadata (`Account`/`Opportunity`/
-  `Order`/`Case` = Private, `Product2` = Public Read Only). The standard `object-meta.xml` files were
-  **deliberately not kept in source** (repo convention). **On `BakerooOrg` this is a MANUAL Setup step**
-  (Sharing Settings) — impactful recalc on the persistent org; see Build Plan §10.3 for exact values.
+- **Standard-object OWD (§10.3):** `Account`/`Opportunity`/`Order`/`Case` = Private, `Product2` = Public
+  Read Only — applied to **`BakerooScratch`** via metadata (standard `object-meta.xml` files **deliberately
+  not kept in source**, repo convention) and to **`BakerooOrg` manually** (Sharing Settings, 2026-07-16,
+  **DONE & verified** via `EntityDefinition` Tooling query — both orgs match).
 - Setting `Account` Private **cascades**: `Opportunity` (and any child OWD) can't exceed `Account`, so
   Opportunity had to move off `ReadWrite`. `sharingModel` enum for "Public Read Only" is **`Read`** (not `ReadOnly`).
 - Nothing is assigned to users yet (no role users); admin keeps access via `Bakeroo_All_Fields`.
 
 **Not yet done:** §9 remainder (per-object layouts, FlexiPages) · §10 remainder (community profile +
-external sharing sets — Experience Cloud phase; **manual standard-OWD on `BakerooOrg`**) · the automation phase.
+external sharing sets — Experience Cloud phase) · the automation phase.
 
 **Known open items:**
 - OWD inconsistency: dev-built objects are `ReadWrite`; scaffolded ones `Private`/`ControlledByParent`

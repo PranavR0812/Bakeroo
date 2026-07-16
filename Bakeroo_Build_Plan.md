@@ -389,7 +389,8 @@ often manual or scripted (`sf org assign permset`).*
 (Community) license + sharing sets, tied to the Experience Cloud phase. Not yet assigned to users
 (no role users exist yet; admin retains full access via `Bakeroo_All_Fields`).
 - [ ] Profiles: `Bakeroo Internal` (minimal clone) + community profile — **not yet built.**
-- [ ] Roles (§10.1) + OWD/sharing (§10.3) — **not yet built.**
+- [x] Roles (§10.1) + OWD/sharing (§10.3) — **done, both orgs.** Standard-object OWD on `BakerooOrg`
+  set manually 2026-07-16 and verified; external sharing sets deferred to the Experience Cloud phase.
 
 ### 10.3 Org-wide defaults / sharing
 
@@ -421,10 +422,11 @@ often manual or scripted (`sf org assign permset`).*
   forces `Opportunity` off `ReadWrite` (child OWD can't exceed Account) → `Opportunity` set Private too.*
   These standard `object-meta.xml` files were **intentionally NOT kept in source** (repo convention avoids
   standard object-metas; change is org-config, not tracked).
-- **Standard objects — `BakerooOrg`: DO MANUALLY** (persistent org, impactful sharing recalc). *Setup →
-  Security → Sharing Settings → Edit:* set **Account = Private, Opportunity = Private, Order = Private,
-  Case = Private, Product2 = Public Read Only**. (`Contact` follows Account under Person Accounts =
-  Controlled by Parent; `OrderItem`/`Pricebook2` use parent/"Use"-based access — leave.)
+- **Standard objects — `BakerooOrg`: DONE (manual, 2026-07-16).** Set via *Setup → Security → Sharing
+  Settings*: **Account = Private, Opportunity = Private, Order = Private, Case = Private, Product2 =
+  Public Read Only**. Verified via `EntityDefinition` Tooling query — matches scratch. (`Contact` follows
+  Account under Person Accounts = Controlled by Parent; `OrderItem`/`Pricebook2` use parent/"Use"-based
+  access — left as-is.)
 - **No sharing rules needed now** — role hierarchy + OWD cover internal visibility; external sharing sets
   are deferred to the Experience Cloud phase.
 - **Not assigned:** roles/permission sets/`Bakeroo Internal` profile aren't attached to users yet (no role
@@ -503,7 +505,7 @@ For continuity only — where the automation layer will attach to this model:
 6. [ ] Pricebooks + Product2 menu (§8) — metadata objects now, **seed DATA later**.
 7. [~] Tabs, app, layouts, Lightning pages per record type (§9) — tabs, app, and Account/Order record-type layouts + assignment **done**; per-custom-object layouts and Lightning record pages deferred.
 8. [ ] Permission sets → profiles → roles (§10.1–10.2).
-9. [ ] Internal OWD/sharing (§10.3); flag external sharing sets for the site phase.
+9. [x] Internal OWD/sharing (§10.3) — done both orgs (`BakerooOrg` standard OWD set manually & verified 2026-07-16); external sharing sets flagged for the site phase.
 10. [ ] `sf project deploy start` to scratch → validate → deploy to `BakerooOrg`.
 11. [ ] Load seed data (products, pricebook entries, ingredients, recipes, inventory) — DATA.
 12. [ ] Hand off to the **automation phase** (§13).
