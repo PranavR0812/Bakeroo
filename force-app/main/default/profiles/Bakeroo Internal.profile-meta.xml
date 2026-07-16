@@ -2,5 +2,25 @@
 <Profile xmlns="http://soap.sforce.com/2006/04/metadata">
     <custom>true</custom>
     <userLicense>Salesforce</userLicense>
-    <description>Minimal base profile for internal Bakeroo staff (SM/SR/OM/SE/Delivery Mgr/MD). Object and field access is granted via the function permission sets (Bakeroo_Sales, Bakeroo_Operations, etc.), not here.</description>
+    <description>Minimal base profile for internal Bakeroo staff. Object/field access comes from the function permission sets, not here. Business/Order record-type visibility lives here (perm sets can't set RT defaults); creates still gated by perm-set object CRUD.</description>
+    <recordTypeVisibilities>
+        <recordType>Account.Bulk_Buyer</recordType>
+        <default>true</default>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>Account.Supplier</recordType>
+        <default>false</default>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>Order.Same_Day_B2C</recordType>
+        <default>true</default>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>Order.Bulk_Scheduled_B2B</recordType>
+        <default>false</default>
+        <visible>true</visible>
+    </recordTypeVisibilities>
 </Profile>

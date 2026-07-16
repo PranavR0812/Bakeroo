@@ -235,15 +235,27 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   — object CRUD + FLS scoped per §10.2 (roll-up/formula fields read-only). Master-detail dependencies included
   as read-only masters (Operations/Delivery_Mgmt add `Order` R; Procurement adds `Ingredient` R; Support adds
   `Contact` R for `Account`).
-- **`Quote` omitted** from `Bakeroo_Sales` — Quotes not enabled on the orgs; enable org-wide before adding.
+- **`Quote`/`QuoteLineItem` (R/W) now in `Bakeroo_Sales`** — Quotes enabled on both orgs via deployable
+  `Settings:Quote` (`enableQuote=true`); previously enabled on dev only (manually), so scratch couldn't stage it.
 - **`Bakeroo_Customer_Community` deferred** — needs external (Community) license + sharing sets (Experience Cloud phase).
 - Not yet assigned to users (no role users exist; admin keeps full access via `Bakeroo_All_Fields`).
+
+**Admin-phase audit fixes (DONE, both orgs):**
+- **Supplier lookup filters (gotcha #11)** — `Ingredient_Supplier__c.Supplier__c`, `Purchase_Order__c.Supplier__c`,
+  `Ingredient__c.Preferred_Supplier__c` now carry a required `lookupFilter` (`Account.RecordType.DeveloperName = Supplier`).
+- **Record-type visibility** — `Bakeroo Internal` profile now has `recordTypeVisibilities` for the 4 business/order
+  RTs (`Account.Bulk_Buyer`/`Supplier`, `Order.Same_Day_B2C`/`Bulk_Scheduled_B2B`). Put on the profile (not perm sets)
+  because **perm sets can't set an RT default**; PersonAccount RT omitted (auto-used; profile assignment rejected).
+  Actual create/edit is still gated by each function perm set's object CRUD.
+- **Still manual/open:** Lead→Opportunity field mapping (gotcha #14) — the 4 custom Lead fields won't carry to
+  Opportunity on conversion until mapped in *Setup → Object Manager → Lead → Map Lead Fields*.
 
 **§10 roles, profile & OWD (mostly DONE):**
 - **Roles (§10.1, both orgs):** `Managing_Director` › (`Sales_Manager` › `Sales_Rep`) + (`Operations_Manager`
   › `Support_Executive`, `Delivery_Manager`).
 - **Profile (§10.2, both orgs):** minimal `Bakeroo Internal` (custom, `Salesforce` license) — object/field
-  access comes from the function permission sets, not the profile.
+  access comes from the function permission sets, not the profile; it does carry `recordTypeVisibilities` for the
+  business/order RTs (see audit fixes above).
 - **Custom-object OWD (§10.3, both orgs):** `Ingredient__c` + `Recipe__c` `ReadWrite → Private`; all other
   custom objects already correct.
 - **Standard-object OWD (§10.3):** `Account`/`Opportunity`/`Order`/`Case` = Private, `Product2` = Public

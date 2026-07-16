@@ -3,6 +3,16 @@
     <fullName>Supplier__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <label>Supplier</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Only Supplier accounts can be selected as the supplier.</errorMessage>
+        <filterItems>
+            <field>Account.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>Supplier</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
     <referenceTo>Account</referenceTo>
     <relationshipLabel>Purchase Orders</relationshipLabel>
     <relationshipName>Purchase_Orders</relationshipName>

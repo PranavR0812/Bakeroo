@@ -22,7 +22,11 @@
 - ✅ **§7 All roll-ups & formulas** — R1 loyalty balance, R2 reserved qty, R3 PO total, F1 available qty, F2 line total.
 - ✅ **§9 (partial) Tabs, app & record-type layouts** — 8 custom tabs; the pre-existing `Bakeroo` Lightning app (built manually in dev) retrieved and enhanced with the custom tabs; **Account** (`Bulk_Buyer`, `Supplier`) + **Order** (`Same_Day_B2C`, `Bulk_Scheduled_B2B`) record-type layouts built and assigned via a minimal partial `Admin` profile; the **Person Account** layout customized in dev (loyalty balance + default delivery address).
 
-**Not yet started:** §8 pricebook + Product2 menu data · §9 remainder (per-custom-object layouts, Lightning record pages/FlexiPages) · §10 permission sets/profiles/roles/OWD-sharing · automation phase.
+**Since updated — now also DONE (both orgs):** §8 pricebook + menu data · §9 complete (per-custom-object
+layouts + Lightning record pages/FlexiPages) · §10 permission sets, `Bakeroo Internal` profile, roles,
+OWD/sharing · supplier lookup filters (gotcha #11) · Quote enabled + wired into `Bakeroo_Sales`.
+**Still open:** manual Lead→Opportunity field mapping (gotcha #14); Experience Cloud phase (community
+profile + external sharing sets + `Bakeroo_Customer_Community`); the automation phase.
 
 **Deviations from the original plan (applied during build):**
 - Order record types are named `Same_Day_B2C` / `Bulk_Scheduled_B2B` (not `Same_Day` / `Bulk_Scheduled`).
@@ -394,11 +398,15 @@ often manual or scripted (`sf org assign permset`).*
 `Bakeroo_Delivery_Mgmt`, `Bakeroo_Support` — each with object CRUD + field-level security for its scope
 (roll-up/formula fields read-only). Master-detail dependencies pulled in as read-only masters
 (Operations/Delivery_Mgmt include `Order` R; Procurement includes `Ingredient` R; Support includes
-`Contact` R for `Account`). **`Quote` omitted from `Bakeroo_Sales`** — Quotes not enabled on the orgs
-(enable org-wide first, then add). **`Bakeroo_Customer_Community` deferred** — needs an external
-(Community) license + sharing sets, tied to the Experience Cloud phase. Not yet assigned to users
-(no role users exist yet; admin retains full access via `Bakeroo_All_Fields`).
-- [ ] Profiles: `Bakeroo Internal` (minimal clone) + community profile — **not yet built.**
+`Contact` R for `Account`). **`Quote`/`QuoteLineItem` (R/W) added to `Bakeroo_Sales`** — Quotes now
+enabled on both orgs (deployable `Settings:Quote` `enableQuote=true`; was manual-only on dev before).
+**`Bakeroo_Customer_Community` deferred** — needs an external (Community) license + sharing sets, tied
+to the Experience Cloud phase. Not yet assigned to users (no role users exist yet; admin retains full
+access via `Bakeroo_All_Fields`).
+- [x] Profile `Bakeroo Internal` (minimal, `Salesforce` license) — **built, both orgs.** Carries
+  `recordTypeVisibilities` for the 4 business/order RTs (`Account.Bulk_Buyer`/`Supplier`,
+  `Order.Same_Day_B2C`/`Bulk_Scheduled_B2B`); PersonAccount RT omitted (auto-used, profile assignment
+  rejected). Object/field access still comes from the function perm sets. Community profile deferred (site phase).
 - [x] Roles (§10.1) + OWD/sharing (§10.3) — **done, both orgs.** Standard-object OWD on `BakerooOrg`
   set manually 2026-07-16 and verified; external sharing sets deferred to the Experience Cloud phase.
 
@@ -456,7 +464,10 @@ often manual or scripted (`sf org assign permset`).*
 8. **Lookup→MD conversion needs every child to have a parent.** On a fresh build (no orphan records) this is free; if data exists first, it blocks.
 9. **Record types need their picklist values + must be assigned** to profiles/permission sets and mapped to layouts, or users can't pick them.
 10. **Person Account roll-ups & MD.** `Loyalty_Point_Transaction__c` MD→Account rolls up to the Person Account fine; ensure the balance field/layout is on the **Customer** (person) layout only.
-11. **`Supplier__c` lookups should be constrained to the Supplier record type** (lookup filter or validation) so bulk buyers/customers aren't picked as suppliers.
+11. **`Supplier__c` lookups constrained to the Supplier record type.** ✅ **DONE (both orgs)** — a `lookupFilter`
+    (`Account.RecordType.DeveloperName = Supplier`, required) is on `Ingredient_Supplier__c.Supplier__c`,
+    `Purchase_Order__c.Supplier__c`, and `Ingredient__c.Preferred_Supplier__c`, so bulk buyers/customers can't be
+    picked as suppliers.
 12. **Deploy order inside a single push:** objects → fields → record types → MD relationships → roll-ups/formulas → tabs/app → layouts/flexipages → permission sets → profiles → roles → sharing. If deploying piecemeal, respect this or references dangle.
 13. **`Delivery_Agent__c` deviates from doc decision 12** (User→custom object). Documented and intentional; the delivery auto-assign automation (later) will read `Is_Available__c` on this object instead of User presence.
 14. **Lead conversion field mapping is manual.** Custom Lead fields (`Estimated_Quantity__c`, `Requested_Delivery_Date__c`, etc.) only carry to Opportunity/Account/Contact if mapped in **Setup → Map Lead Fields**. Not fully captured by object metadata.
@@ -512,12 +523,12 @@ For continuity only — where the automation layer will attach to this model:
 3. [x] Tier-1 custom objects: `Ingredient__c`, `Recipe__c`, `Delivery_Agent__c` (§5.1–5.3).
 4. [x] Tier-2 objects & junctions: `Recipe_Ingredient__c`, `Ingredient_Inventory__c`, `Ingredient_Supplier__c`, `Inventory_Reservation__c`, `Purchase_Order__c`, `Purchase_Order_Line__c`, `Delivery__c`, `Feedback__c`, `Loyalty_Point_Transaction__c` (§5.4–5.12), incl. master-detail relationships.
 5. [x] Roll-ups & formulas (§7): F2 → R3; secondary-MD → R2 → F1; R1.
-6. [ ] Pricebooks + Product2 menu (§8) — metadata objects now, **seed DATA later**.
+6. [x] Pricebooks + Product2 menu (§8) — Standard Pricebook activated, `Bakeroo Menu` Pricebook2, 5 menu products + entries; seed data loaded. Both orgs.
 7. [x] Tabs, app, layouts, Lightning pages per record type (§9) — tabs, app, Account/Order record-type layouts + assignment, **per-custom-object layouts (8 tab'd objects)**, and **Lightning record pages (FlexiPages, 8, org-default assigned)** all **done**, both orgs.
-8. [ ] Permission sets → profiles → roles (§10.1–10.2).
+8. [x] Permission sets → profiles → roles (§10.1–10.2) — 5 function perm sets (+`Bakeroo_All_Fields`), minimal `Bakeroo Internal` profile (with business/order RT visibility), 6 roles. Both orgs. (Community profile + `Bakeroo_Customer_Community` deferred to the site phase; not yet assigned to users.)
 9. [x] Internal OWD/sharing (§10.3) — done both orgs (`BakerooOrg` standard OWD set manually & verified 2026-07-16); external sharing sets flagged for the site phase.
-10. [ ] `sf project deploy start` to scratch → validate → deploy to `BakerooOrg`.
-11. [ ] Load seed data (products, pricebook entries, ingredients, recipes, inventory) — DATA.
+10. [x] `sf project deploy start` to scratch → validate → deploy to `BakerooOrg` — standing workflow, applied to every increment.
+11. [x] Load seed data (products, pricebook entries, ingredients, recipes, inventory) — DATA. Loaded via `scripts/apex/seed_menu_data.apex`, both orgs.
 12. [ ] Hand off to the **automation phase** (§13).
 
 ---

@@ -3,6 +3,16 @@
     <fullName>Preferred_Supplier__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <label>Preferred Supplier</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Only Supplier accounts can be selected as the preferred supplier.</errorMessage>
+        <filterItems>
+            <field>Account.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>Supplier</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
     <referenceTo>Account</referenceTo>
     <relationshipLabel>Ingredients</relationshipLabel>
     <relationshipName>Ingredients</relationshipName>
