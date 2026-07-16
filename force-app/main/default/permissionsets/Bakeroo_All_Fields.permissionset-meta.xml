@@ -83,8 +83,10 @@
     <fieldPermissions><field>Loyalty_Point_Transaction__c.Type__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
 
     <!-- ===== Opportunity ===== -->
+    <fieldPermissions><field>Opportunity.Bulk_Source__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Opportunity.Deposit_Amount__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Opportunity.Deposit_Paid__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Opportunity.Items_of_Interest__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Opportunity.Feasibility_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Opportunity.Requested_Delivery_Date__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Opportunity.Total_Quantity__c</field><readable>true</readable><editable>true</editable></fieldPermissions>

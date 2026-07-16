@@ -247,8 +247,12 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   RTs (`Account.Bulk_Buyer`/`Supplier`, `Order.Same_Day_B2C`/`Bulk_Scheduled_B2B`). Put on the profile (not perm sets)
   because **perm sets can't set an RT default**; PersonAccount RT omitted (auto-used; profile assignment rejected).
   Actual create/edit is still gated by each function perm set's object CRUD.
-- **Still manual/open:** Lead→Opportunity field mapping (gotcha #14) — the 4 custom Lead fields won't carry to
-  Opportunity on conversion until mapped in *Setup → Object Manager → Lead → Map Lead Fields*.
+- **1:1 Lead→Opportunity map targets** — added `Opportunity.Items_of_Interest__c` (LongTextArea 32768) and
+  `Opportunity.Bulk_Source__c` (Picklist: Bulk Button / Threshold Trip), matching the Lead fields; FLS granted via
+  `Bakeroo_All_Fields` + `Bakeroo_Sales`. All 4 Lead customs now have a clean target
+  (`Requested_Delivery_Date__c`→same, `Estimated_Quantity__c`→`Total_Quantity__c`, `Items_of_Interest__c`→same,
+  `Bulk_Source__c`→same). **Still manual/open:** the actual mapping in *Setup → Object Manager → Lead → Map Lead
+  Fields* (not metadata-capturable) — the only remaining admin-phase item.
 
 **§10 roles, profile & OWD (mostly DONE):**
 - **Roles (§10.1, both orgs):** `Managing_Director` › (`Sales_Manager` › `Sales_Rep`) + (`Operations_Manager`

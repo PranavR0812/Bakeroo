@@ -139,7 +139,9 @@ Build these before custom objects where custom objects reference them (e.g. `Ord
 - [ ] `Feasibility_Status__c` — Picklist (Feasible / Shortfall-Replenishable / Not-Feasible)
 - [ ] `Deposit_Amount__c` — Currency
 - [ ] `Deposit_Paid__c` — Checkbox *(gates the commit point — automation hook, later)*
-- [ ] `Total_Quantity__c` — Number
+- [ ] `Total_Quantity__c` — Number *(Lead `Estimated_Quantity__c` maps here on conversion)*
+- [x] `Items_of_Interest__c` — Long Text Area (32768) *(added as the 1:1 map target for Lead `Items_of_Interest__c`)*
+- [x] `Bulk_Source__c` — Picklist (Bulk Button / Threshold Trip) *(added as the 1:1 map target for Lead `Bulk_Source__c`)*
 
 ### 4.4 Order — 2 record types + fields
 - [ ] Record types: **Same_Day** (B2C), **Bulk_Scheduled** (B2B).
@@ -470,7 +472,11 @@ access via `Bakeroo_All_Fields`).
     picked as suppliers.
 12. **Deploy order inside a single push:** objects → fields → record types → MD relationships → roll-ups/formulas → tabs/app → layouts/flexipages → permission sets → profiles → roles → sharing. If deploying piecemeal, respect this or references dangle.
 13. **`Delivery_Agent__c` deviates from doc decision 12** (User→custom object). Documented and intentional; the delivery auto-assign automation (later) will read `Is_Available__c` on this object instead of User presence.
-14. **Lead conversion field mapping is manual.** Custom Lead fields (`Estimated_Quantity__c`, `Requested_Delivery_Date__c`, etc.) only carry to Opportunity/Account/Contact if mapped in **Setup → Map Lead Fields**. Not fully captured by object metadata.
+14. **Lead conversion field mapping is manual.** Custom Lead fields only carry to Opportunity if mapped in
+    **Setup → Object Manager → Lead → Map Lead Fields** — *not* captured by object metadata. All four now have a
+    1:1 Opportunity target (fields built both orgs): `Requested_Delivery_Date__c → Requested_Delivery_Date__c`,
+    `Estimated_Quantity__c → Total_Quantity__c`, `Items_of_Interest__c → Items_of_Interest__c`,
+    `Bulk_Source__c → Bulk_Source__c`. **Still requires the manual mapping step** (the only open admin-phase item).
 15. **Address compound fields** (`Default_Delivery_Address__c`, `Delivery_Address__c`) are custom Address-type fields — verify they render on layouts; they can't be used in some formula contexts.
 
 ---
