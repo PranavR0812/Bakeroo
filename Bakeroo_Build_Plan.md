@@ -536,9 +536,216 @@ For continuity only — where the automation layer will attach to this model:
 9. [x] Internal OWD/sharing (§10.3) — done both orgs (`BakerooOrg` standard OWD set manually & verified 2026-07-16); external sharing sets flagged for the site phase.
 10. [x] `sf project deploy start` to scratch → validate → deploy to `BakerooOrg` — standing workflow, applied to every increment.
 11. [x] Load seed data (products, pricebook entries, ingredients, recipes, inventory) — DATA. Loaded via `scripts/apex/seed_menu_data.apex`, both orgs.
-12. [ ] Hand off to the **automation phase** (§13).
+12. [~] Hand off to the **automation phase** — planned in §15 (in progress).
 
 ---
 
-*End of build plan. Boundaries: Experience Cloud site + Commerce WebStore/WebCart and the entire
-automation layer are explicitly out of scope here and are the next phases.*
+## 15. Automation phase — design & sequencing
+
+> **Status: PLANNING (started 2026-07-16).** This section turns the §13 hook points into an actual
+> automation design. It builds on the completed data-model + admin config. **The four shaping decisions
+> (§15.8) are RESOLVED with the owner (2026-07-16)** and folded into the design below.
+
+### 15.0 Scope & principles
+- **Declarative-first + targeted Apex** *(Q1 ✅).* Record-triggered Flows + scheduled Flows for
+  orchestration; **invocable Apex** only for the three collection/aggregation-heavy calcs (recipe explosion,
+  bulk feasibility projection, PO consolidation) where Flow loops get ugly and hit limits.
+- **Respect the split-object model.** Customer `Order` automation and supplier `Purchase_Order__c`
+  automation stay separate; the only bridges are the two documented signals (Entry-B PO trigger out of
+  Flow 2; goods-receipt confirmation back into Flow 2).
+- **All consumption routes through `Recipe → Recipe_Ingredient__c`.** One reusable calc computes ingredient
+  demand for an Order: for each `OrderItem` → its `Product2` → `Recipe__c` → `Recipe_Ingredient__c` rows,
+  `demand += (OrderItem.Quantity / Recipe.Yield__c) × Recipe_Ingredient.Quantity_Required__c`.
+- **Preserve the reservation → deduction lifecycle:** reserve at checkout/commit (Status `Active`),
+  finalize-and-deduct at prep (`Finalized` + decrement On-Hand), release on cancel (`Released`).
+- **Automation begins at `Order` creation** *(Q2 ✅).* The storefront, cart, checkout, and payment capture
+  are the **Experience Cloud layer (§16)** — the two phases interlock (the site creates the Orders/Leads
+  these automations act on and surfaces their results). Automation fires as if the storefront just created
+  the Order, driven off record fields it sets (esp. `Payment_Status__c`, `Kitchen_Status__c`). The same-day
+  feasibility check and soft reservation are **built and tested as Flows on `Order`**, independent of the site.
+- **External touchpoints simulated** *(Q4 ✅).* No payment gateway — automation triggers off
+  `Payment_Status__c` (set externally/manually). Customer status updates + OM/Admin PO alerts are Salesforce
+  **email alerts via Flow**; no external SMS/marketing integration in V1.
+
+### 15.1 Shared foundations (build FIRST)
+| # | Component | Type | Notes |
+|---|---|---|---|
+| F-1 | **Kitchen capacity model** *(Q3 ✅)* | Custom Metadata Type | New `Kitchen_Capacity__mdt` (deployable config): `Daily_Order_Cap__c` + `Same_Day_Cutoff_Time__c` (per-date Capacity object deferred to later). Feasibility = today's order count < cap AND now < cutoff. Not in the data model before — added here. |
+| F-2 | **Ingredient-demand calc** (recipe explosion for an Order) | Invocable Apex | Reused by soft-reserve, prep-deduction, and (scaled) bulk feasibility. Handles `Yield__c`. |
+| F-3 | **Reservation helper** (create / finalize / release for an Order) | Invocable Apex or subflow | Finds the `Ingredient_Inventory__c` row per ingredient (1/ingredient in V1), writes `Inventory_Reservation__c`. |
+
+### 15.2 Flow 1 — Same-day B2C (from `Order` creation onward)
+| # | Automation | Trigger | Type | Does |
+|---|---|---|---|---|
+| 1-A | Same-day feasibility | `Order` created, RT `Same_Day_B2C` | Record-triggered Flow | Check cutoff time + capacity (F-1); set an outcome field / block if infeasible |
+| 1-B | Soft reservation | `Order` created (feasible) | RT Flow → F-2/F-3 | Create `Active` `Soft` reservations for the order's ingredient demand |
+| 1-C | Payment gate → kitchen | `Payment_Status__c` → Paid | RT Flow | Set `Kitchen_Status__c = Queued` (kitchen never starts before payment) |
+| 1-D | Prep deduction | `Kitchen_Status__c` → Prepared | RT Flow → F-2 | Finalize reservations + decrement `Ingredient_Inventory__c.Quantity_On_Hand__c` |
+| 1-E | Auto-assign delivery agent | Order ready for delivery | RT Flow | Create `Delivery__c`, assign an available `Delivery_Agent__c` (round-robin) |
+| 1-F | Delivery success | `Delivery__c.Status__c` → Delivered | RT Flow | Mark success; create `Feedback__c` request + `Loyalty_Point_Transaction__c` (Earn) |
+| 1-G | Cancel / refund / failed delivery | Order cancelled / delivery failed | RT Flow | Release reservations; set `Refunded` if pre-prep; failed-delivery sub-path |
+| 1-H | Customer notifications | Order/Delivery status changes | RT Flow (email) | Confirmed → Preparing → Out for delivery → Delivered |
+
+### 15.3 Flow 2 — Bulk B2B (Sales pipeline)
+| # | Automation | Trigger | Type | Does |
+|---|---|---|---|---|
+| 2-A | Lead routing | Bulk `Lead` created | Assignment rule / Flow | Route to a Sales Rep |
+| 2-B | **Bulk feasibility projection** | Quote stage / on demand | Invocable Apex | `on-hand − active reservations + inbound POs arriving ≤ date` vs demand; set `Opportunity.Feasibility_Status__c` |
+| 2-C | Discount approval | Quote/Opp discount > threshold | Approval (§15.5) | Route to OM/MD; else auto-approve |
+| 2-D | **Closed-Won commit** | `Opportunity` Won + `Deposit_Paid__c` | RT Flow → F-3/Apex | Create forward reservation(s); if shortfall flagged, trigger Entry-B PO (needed-by = requested date) |
+| 2-E | Scheduled order creation | Closed-Won | RT Flow | Create the scheduled `Order` (RT `Bulk_Scheduled_B2B`), not yet in kitchen |
+| 2-F | **Scheduled kitchen drop** | N hrs before `Scheduled_Delivery_Date__c` | Scheduled Flow | Flip to `Queued` — **gated on goods-receipt** of any Entry-B PO; then rejoins 1-D…1-F |
+
+### 15.4 Flow 3 — Procurement (supplier side)
+| # | Automation | Trigger | Type | Does |
+|---|---|---|---|---|
+| 3-A | Reactive reorder (Entry A) | `Ingredient_Inventory__c` update | RT Flow | Flag ingredient when available stock will fall below threshold given lead time + safety stock |
+| 3-B | Forward shortfall (Entry B) | from 2-D | (part of 2-D) | Flag shortfall ingredient(s) with needed-by date |
+| 3-C | **PO consolidation** | Batch of flagged ingredients | Scheduled Flow → Apex | Group by preferred supplier (Ingredient-Supplier junction), create ONE `Purchase_Order__c` per supplier + lines |
+| 3-D | PO approval tiering | PO created, value high | Approval (§15.5) | Route to OM; small POs auto-approve |
+| 3-E | Alert OM/Admin | PO created/approved | RT Flow (email) | Notify with the PO |
+| 3-F | Goods receipt | `Purchase_Order_Line__c.Quantity_Received__c` update | RT Flow | Replenish `Quantity_On_Hand__c`; update line/PO status; if Entry B, signal 2-F to release the drop |
+
+### 15.5 Approvals
+Two approvals — bulk discount (2-C) and high-value PO (3-D). **Default: classic Approval Processes**
+(clean value-threshold → OM/MD routing, well understood). Flow-based approval orchestration is the
+alternative if richer logic is wanted. *(Mechanism + thresholds still open — §15.10.)*
+
+### 15.6 Notifications
+Email alerts via Flow for customer status updates (1-H) and OM/Admin PO alerts (3-E). No external
+SMS/marketing integration in V1 (Q4 ✅).
+
+### 15.7 Build sequence (dependency-ordered)
+1. **Foundations** F-1…F-3 (capacity, demand calc, reservation helper) — everything else leans on these.
+2. **Flow 1 core lifecycle** 1-B → 1-C → 1-D → 1-E → 1-F (proves reserve → deduct → deliver → loyalty end-to-end).
+3. **Flow 3 Entry A + goods receipt** 3-A, 3-C, 3-F (closes the inventory loop; simplest procurement path).
+4. **Flow 2** 2-B → 2-D → 2-E → 2-F + Entry-B wiring (the forward/scheduled path; hardest).
+5. **Approvals** 2-C, 3-D.
+6. **Feasibility gate** 1-A + **notifications** 1-H, 3-E.
+7. **Branches** 1-G (cancel/refund/failed delivery).
+
+### 15.8 Shaping decisions — RESOLVED (2026-07-16)
+- **Q1 — implementation stance:** ✅ **Declarative-first + targeted invocable Apex.** Flows orchestrate;
+  Apex (unit-tested) does recipe explosion (F-2), bulk feasibility projection (2-B), PO consolidation (3-C).
+- **Q2 — where Flow 1 automation starts:** ✅ **At `Order` creation.** Feasibility + soft reservation are
+  built as Flows on `Order` (storefront/cart/checkout/payment stay external).
+- **Q3 — kitchen capacity model:** ✅ **`Kitchen_Capacity__mdt` custom metadata** (daily order cap +
+  same-day cutoff time). Per-date `Capacity__c` object deferred to a later iteration.
+- **Q4 — external touchpoints:** ✅ **Simulate payment** (trigger off `Payment_Status__c`) **+ email
+  notifications** via Flow (customer status updates, OM/Admin PO alerts). No gateway/SMS in V1.
+
+### 15.10 Still open (to settle as we build)
+- **Approval mechanism** (§15.5): classic Approval Processes (default) vs. Flow approval orchestration.
+- **Discount / high-value-PO thresholds** — the actual numeric cutoffs for 2-C and 3-D.
+- **Delivery auto-assign rule** (1-E): pure round-robin vs. availability + load balancing.
+- **Loyalty accrual rate** (1-F): points per currency/order.
+- **Same-day cutoff + daily cap values** for `Kitchen_Capacity__mdt` seed.
+
+### 15.9 Testing & quality
+- **Apex unit tests** (≥75%, meaningful assertions) for every invocable class (F-2, F-3, 2-B, 3-C).
+- **Flow tests / debug runs** on scratch with the seeded dataset; verify the reservation lifecycle end-to-end.
+- Build + iterate on `BakerooScratch`, validate (`--dry-run`), then promote to `BakerooOrg` — same workflow.
+- Bulk-safe: all Flows/Apex must handle multi-record operations (no per-record SOQL/DML in loops).
+
+---
+
+## 16. Experience Cloud phase — storefront & customer portal
+
+> **Status: PLANNING (started 2026-07-16).** The customer-facing layer on **Experience Cloud (Digital
+> Experiences)**: the D2C storefront + logged-in customer account portal. It **interlocks with the
+> automation phase (§15)** — the site creates the `Order`s / `Lead`s that §15 automations act on, and
+> surfaces their results (order status, loyalty balance, feedback, cases). **Experience sites are largely
+> manual / not cleanly deployable**, so this plan separates the *deployable* pieces (profile, perm set,
+> Apex, LWCs) from the *manual* per-org site config (site creation, sharing sets, guest/login settings).
+
+### 16.0 Scope & principles — decisions RESOLVED (2026-07-16)
+- **External users = Person Account customers** (Customer RT) — the loyalty anchor (context §4 decision 4).
+- **Forced login at the cart → checkout boundary** — browse + cart as **guest**; login/register to check out.
+- **Commerce depth (EC-Q1 ✅): custom LWR site + light cart.** An LWR Experience site with custom LWCs for
+  menu browse + a lightweight cart; **checkout creates `Order` + `OrderItem`s** that feed §15. No Salesforce
+  B2C Commerce engine (WebStore/WebCart) — it typically needs a Commerce license the Dev Edition org lacks.
+  → **Template (EC-Q2): LWR "Build Your Own"** (follows from the custom-cart choice).
+- **Build extent (EC-Q3 ✅): deployable pieces now + document manual.** Build/deploy the perm set, external
+  profile, Person Account self-reg Apex (+tests), and storefront/portal LWCs; **document** the manual per-org
+  site config (creation/activation, sharing sets, guest, login/reg) for a focused hands-on pass.
+
+### 16.1 Enablement & site (org-level / mostly manual)
+| # | Item | Delivery |
+|---|---|---|
+| S-1 | Enable **Digital Experiences** (both orgs; add `Communities` to `project-scratch-def.json` `features`) | Manual + scratch feature |
+| S-2 | Create the Experience **site** (template — ▶ EC-Q2) | Manual (Experience workspace) |
+| S-3 | Branding (bakery theme), navigation, pages, activation, domain | Manual |
+
+### 16.2 External users, licenses & access
+| # | Item | Delivery | Notes |
+|---|---|---|---|
+| X-1 | **`Customer Community Plus`** profile (Login or Member), cloned/minimal | Metadata (partial) | external base profile |
+| X-2 | **`Bakeroo_Customer_Community`** permission set (build now — was deferred) | Metadata | Product2/Pricebook (R); own Order/OrderItem/Feedback (R/W); Loyalty (R); Case (R/W) |
+| X-3 | **External OWD** (external-access column) = Private for Account/Contact/Order/Feedback/Loyalty/Case | Manual | customers see only their own |
+| X-4 | **Sharing sets** — grant each external user their related records (Orders/Feedback/Loyalty/Cases) by Contact/Account match | Manual (Experience workspace) | the mechanism for "own records only" |
+| X-5 | **Guest user** profile + guest sharing rules for menu browse (Product2/Pricebook R) | Manual + metadata | guest can browse, not buy |
+
+### 16.3 Self-registration & login
+- **Self-registration** creates a **Person Account** + external user (Customer RT). Custom Apex self-reg
+  handler adapting the stock `CommunitiesSelfRegController` / `Site.createExternalUser` for Person Accounts
+  (owner, record type, Contact linkage). *Deployable Apex + tests.*
+- **Login gate at checkout** (Flow 1 step 3) — guest cart, forced login to place the order.
+
+### 16.4 Storefront & cart — **chosen: custom LWR site + light cart (Option B, EC-Q1 ✅)**
+- **LWCs** on an LWR site: menu browse, product detail (Product2 + `Bakeroo Menu` pricebook), and a
+  **lightweight cart**; **checkout creates `Order` + `OrderItem`s**, which fire the §15 Flow 1 automations
+  (feasibility → soft reserve → payment gate → …). No `WebStore`/`WebCart` engine.
+- The **"Bulk Order?"** button (guest-accessible) → creates a `Lead` → Flow 2 entry (§15 2-A).
+- *Not built:* Salesforce B2C Commerce (Option A — likely needs a Commerce license Dev Edition lacks) and
+  portal-only (Option C). Recorded for context; not the chosen path.
+
+### 16.5 Customer portal pages
+Menu browse + product detail (Product2 + `Bakeroo Menu` pricebook) · cart + checkout (per fork) · order
+history + live status (`Kitchen_Status__c`, `Delivery__c.Status__c`) · **loyalty balance** (Account roll-up)
+· **feedback** submission (post-delivery) · **case** creation/support (Service Cloud).
+
+### 16.6 Interlock with the automation phase (§15)
+- Checkout → **Order create** → 1-A feasibility + 1-B soft reserve.
+- Payment (`Payment_Status__c` → Paid) → 1-C kitchen queue.
+- Status updates (1-H) surface in the portal **and** as email.
+- **"Bulk Order?"** → Lead → 2-A routing.
+- Delivery success → 1-F loyalty accrual + feedback request appear in the portal.
+
+### 16.7 Deployability split
+- **Deployable:** `Bakeroo_Customer_Community` perm set, external profile (partial), self-reg Apex + tests,
+  storefront/portal **LWCs**, some `DigitalExperienceBundle` metadata (finicky).
+- **Manual / per-org (Experience workspace):** site creation & activation, **sharing sets**, external OWD,
+  guest config, membership, login/registration settings, domain. (Mirrors the §10.3 note that external
+  sharing is largely manual.)
+- **`Communities`** feature flag → `config/project-scratch-def.json`.
+
+### 16.8 Decisions — RESOLVED (2026-07-16)
+- **EC-Q1 — Commerce-engine depth:** ✅ **Custom LWR site + light cart** (Option B); checkout creates
+  `Order`/`OrderItem`s. B2C Commerce not used (Dev Edition license). 
+- **EC-Q2 — Site template:** ✅ **LWR "Build Your Own"** (follows from EC-Q1).
+- **EC-Q3 — Build extent:** ✅ **Deployable pieces now + document manual.** Perm set, external profile,
+  self-reg Apex (+tests), LWCs are built/deployed; site creation, sharing sets, guest, and login/reg are
+  documented for a manual per-org pass.
+
+### 16.10 Still open (to settle as we build)
+- **External license type** — `Customer Community Plus` **Login** vs. **Member** (per-login vs. named-user cost model).
+- **Self-reg ownership** — which internal user/queue owns self-registered Person Accounts.
+- **Guest checkout** stays **V2** (deferred by design) — guest can browse/cart, must log in to buy.
+- Whether to attempt any `DigitalExperienceBundle` metadata capture, or treat the whole site as manual.
+
+### 16.9 Sequencing
+1. Enable Digital Experiences (both orgs) + `Communities` scratch feature.
+2. External profile + `Bakeroo_Customer_Community` perm set + external OWD + sharing sets.
+3. Self-registration (Person Account) + guest menu browse.
+4. Storefront / cart per EC-Q1; portal pages (LWCs).
+5. Wire to automation (§15) + email notifications.
+
+> **Phasing note:** §15 (automation) and §16 (Experience Cloud) can proceed largely in parallel — §15 is
+> back-office/testable on its own; §16 is the front door. Recommended: land the §15 foundations + Flow 1
+> lifecycle first so the site has working behavior to sit on top of.
+
+---
+
+*End of build plan. The automation layer (§15) and the Experience Cloud storefront/portal (§16) are both
+now designed here, decisions resolved. Not building: Salesforce **B2C Commerce** (WebStore/WebCart — Dev
+Edition license) and **guest checkout** (V2).*

@@ -156,11 +156,14 @@ sf data query -o <org> -q "SELECT …"
 
 ## Scope guardrails
 
-- **In scope now:** object/data model + admin config (objects, fields, record types, relationships,
-  roll-ups, pricebooks, layouts, profiles/permission sets/roles, OWD/sharing).
-- **NOT yet (next phase):** the automation layer — record-triggered Flows, scheduled Flows, approval
-  processes. Note *where* automation hooks in, but don't design it.
-- **Boundaries (out of scope):** Experience Cloud site + Commerce WebStore/WebCart build-out.
+- **Done:** object/data model + admin config (objects, fields, record types, relationships, roll-ups,
+  pricebooks, layouts, profiles/permission sets/roles, OWD/sharing) — see `Bakeroo_Admin_Phase_Summary.md`.
+- **In scope now (planned, Build Plan §15–§16):** the **automation layer** — record-triggered Flows,
+  scheduled Flows, approvals, + targeted invocable Apex (declarative-first) — and the **Experience Cloud**
+  storefront/portal (**custom LWR site + light cart**; external profile, `Bakeroo_Customer_Community` perm
+  set, Person Account self-reg Apex, LWCs; site/sharing-set config done manually + documented).
+- **Boundaries (still out of scope):** Salesforce **B2C Commerce** (WebStore/WebCart/CartItem — Dev Edition
+  lacks the license) and **guest checkout** (V2). Design decisions for §15/§16 are recorded resolved in the Build Plan.
 
 ---
 
