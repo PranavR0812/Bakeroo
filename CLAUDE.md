@@ -251,8 +251,9 @@ Data-model + record-type layer built per `Bakeroo_Build_Plan.md` and deployed to
   `Opportunity.Bulk_Source__c` (Picklist: Bulk Button / Threshold Trip), matching the Lead fields; FLS granted via
   `Bakeroo_All_Fields` + `Bakeroo_Sales`. All 4 Lead customs now have a clean target
   (`Requested_Delivery_Date__c`→same, `Estimated_Quantity__c`→`Total_Quantity__c`, `Items_of_Interest__c`→same,
-  `Bulk_Source__c`→same). **Still manual/open:** the actual mapping in *Setup → Object Manager → Lead → Map Lead
-  Fields* (not metadata-capturable) — the only remaining admin-phase item.
+  `Bulk_Source__c`→same). The Map Lead Fields step itself is **done on `BakerooOrg`** (2026-07-16, manual);
+  it's org config (not metadata-capturable), so **`BakerooScratch` must be re-mapped separately** if the
+  pipeline is exercised there. This closes the admin phase — see `design-docs/Bakeroo_Admin_Phase_Summary.md`.
 
 **§10 roles, profile & OWD (mostly DONE):**
 - **Roles (§10.1, both orgs):** `Managing_Director` › (`Sales_Manager` › `Sales_Rep`) + (`Operations_Manager`

@@ -160,3 +160,4 @@ Full field-level detail and the Mermaid ER diagram are in `Bakeroo_Data_Model_v1
 | `Bakeroo_Project_Context.md` | *This file* — project overview, decisions, status, handoff notes |
 | `Bakeroo_Process_Flows_v1.md` | Three process flows: written steps + Mermaid flowcharts |
 | `Bakeroo_Data_Model_v1.md` | Objects, fields, relationships, Mermaid ER diagram; Appendix A = rejected single-object variant |
+| `Bakeroo_Admin_Phase_Summary.md` | As-built summary of the data-model + admin-config phase: what's done, what's open, what's out of scope |

@@ -476,7 +476,8 @@ access via `Bakeroo_All_Fields`).
     **Setup → Object Manager → Lead → Map Lead Fields** — *not* captured by object metadata. All four now have a
     1:1 Opportunity target (fields built both orgs): `Requested_Delivery_Date__c → Requested_Delivery_Date__c`,
     `Estimated_Quantity__c → Total_Quantity__c`, `Items_of_Interest__c → Items_of_Interest__c`,
-    `Bulk_Source__c → Bulk_Source__c`. **Still requires the manual mapping step** (the only open admin-phase item).
+    `Bulk_Source__c → Bulk_Source__c`. **Mapping done on `BakerooOrg`** (2026-07-16, manual). It's org config
+    (not metadata), so `BakerooScratch` must be re-mapped separately if the pipeline is exercised there.
 15. **Address compound fields** (`Default_Delivery_Address__c`, `Delivery_Address__c`) are custom Address-type fields — verify they render on layouts; they can't be used in some formula contexts.
 
 ---
